@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amoyni</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/reset.css">
+<style>
+  body { display:flex; align-items:center; justify-content:center; min-height:100vh; background: var(--gradient-navy); }
+  .splash { text-align:center; color:white; }
+  .splash .mark { width:84px;height:84px;border-radius:24px;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:2rem;margin:0 auto 16px; box-shadow: var(--shadow-glow-blue); }
+  .spinner{width:28px;height:28px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:20px auto 0;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <div class="splash">
+    <div class="mark">A</div>
+    <div style="font-weight:900;font-size:1.4rem;">Amoyni</div>
+    <div class="spinner"></div>
+  </div>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    var session = window.AmoyniSession.getYouth();
+    window.location.replace(session ? "dashboard.html" : "login.html");
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>إنشاء اجتماع — Amoyni Admin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/youth.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <div class="main-with-sidebar">
+      <div class="admin-topbar">
+        <button class="btn btn-icon btn-ghost sidebar-toggle" id="sidebar-toggle-btn">☰</button>
+        <div class="admin-page-title" id="admin-page-title"></div>
+        <span style="width:44px;"></span>
+      </div>
+      <main class="page-content" style="max-width:640px;">
+        <form id="create-meeting-form" class="card">
+          <div class="field" id="field-title">
+            <label class="field-label">اسم اليوم / الاجتماع</label>
+            <input class="field-input" type="text" id="title" required>
+            <div class="field-error-text"></div>
+          </div>
+          <div class="field" id="field-meeting_date">
+            <label class="field-label">تاريخ الاجتماع</label>
+            <input class="field-input" type="date" id="meeting_date" required>
+            <div class="field-error-text"></div>
+          </div>
+          <div class="grid-1 sm-cols-2">
+            <div class="field" id="field-attendance_start">
+              <label class="field-label">بداية وقت الحضور</label>
+              <input class="field-input" type="datetime-local" id="attendance_start" required>
+              <div class="field-error-text"></div>
+            </div>
+            <div class="field" id="field-attendance_end">
+              <label class="field-label">نهاية وقت الحضور</label>
+              <input class="field-input" type="datetime-local" id="attendance_end" required>
+              <div class="field-error-text"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">نوع المحتوى</label>
+            <select class="field-select" id="content_type">
+              <option value="verse">آية</option>
+              <option value="announcement">إعلان</option>
+              <option value="encouragement">رسالة تشجيعية</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">نص الآية / الرسالة</label>
+            <textarea class="field-textarea" id="verse_text"></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label">نص الإعلان (اختياري)</label>
+            <textarea class="field-textarea" id="announcement_text"></textarea>
+          </div>
+
+          <label class="checkbox-row mb-4">
+            <input type="checkbox" id="raffle_enabled" checked>
+            <span class="text-sm">تفعيل الطمبولة لهذا الاجتماع</span>
+          </label>
+          <div class="grid-1 sm-cols-2" id="raffle-range-fields">
+            <div class="field">
+              <label class="field-label">بداية أرقام الطمبولة</label>
+              <input class="field-input" type="number" id="raffle_start" value="1" min="1">
+            </div>
+            <div class="field">
+              <label class="field-label">نهاية أرقام الطمبولة</label>
+              <input class="field-input" type="number" id="raffle_end" value="100" min="1">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg mt-2" id="create-submit">
+            <span class="btn-label">إنشاء الاجتماع (Draft)</span>
+          </button>
+          <p class="text-xs text-muted text-center mt-2">هيتم إنشاء الاجتماع كمسودة — تقدر تضيف شرائح النقاط بعدين قبل ما تبدأه</p>
+        </form>
+      </main>
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <script src="../assets/vendor/supabase.js"></script>
+  <script src="../config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/validation.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/admin/nav.js"></script>
+  <script src="../assets/js/admin/meeting-create.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة التحكم — Amoyni Admin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/youth.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <div class="main-with-sidebar">
+      <div class="admin-topbar">
+        <button class="btn btn-icon btn-ghost sidebar-toggle" id="sidebar-toggle-btn">☰</button>
+        <div class="admin-page-title" id="admin-page-title"></div>
+        <span style="width:44px;"></span>
+      </div>
+      <main class="page-content">
+        <div class="kpi-grid" id="kpi-grid">
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+
+        <div class="grid-1 lg-cols-2 mt-6">
+          <div class="card">
+            <div class="section-title">الحضور عبر آخر الاجتماعات</div>
+            <div class="bar-chart" id="chart-attendance"></div>
+          </div>
+          <div class="card">
+            <div class="section-title">توزيع الصفوف</div>
+            <div class="bar-chart" id="chart-grades"></div>
+          </div>
+        </div>
+
+        <div class="card mt-6">
+          <div class="section-title">آخر النشاطات</div>
+          <div class="grid-1 lg-cols-3" id="recent-activity-cols"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <script src="../assets/vendor/supabase.js"></script>
+  <script src="../config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/admin/nav.js"></script>
+  <script src="../assets/js/admin/dashboard.js"></script>
+</body>
+</html>

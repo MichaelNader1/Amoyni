@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>إنشاء حساب — Amoyni</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/reset.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/youth.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-logo">
+        <div class="brand-mark-lg">A</div>
+        <div class="brand-name">انضم إلى Amoyni</div>
+        <div class="brand-tag">حسابك هيتفعّل فورًا من غير ما تستنى موافقة</div>
+      </div>
+
+      <form id="register-form" novalidate>
+        <div class="field" id="field-full_name">
+          <label class="field-label" for="full_name">الاسم الكامل</label>
+          <input class="field-input" type="text" id="full_name" name="full_name" placeholder="مثال: مينا فايز" required>
+          <div class="field-error-text"></div>
+        </div>
+
+        <div class="field" id="field-phone">
+          <label class="field-label" for="phone">رقم الهاتف</label>
+          <input class="field-input" type="tel" id="phone" name="phone" placeholder="01xxxxxxxxx" inputmode="numeric" required>
+          <div class="field-error-text"></div>
+        </div>
+
+        <div class="field" id="field-password">
+          <label class="field-label" for="password">كلمة المرور</label>
+          <input class="field-input" type="password" id="password" name="password" placeholder="6 خانات على الأقل" required>
+          <div class="field-error-text"></div>
+        </div>
+
+        <div class="field" id="field-password_confirm">
+          <label class="field-label" for="password_confirm">تأكيد كلمة المرور</label>
+          <input class="field-input" type="password" id="password_confirm" name="password_confirm" placeholder="أعد كتابة كلمة المرور" required>
+          <div class="field-error-text"></div>
+        </div>
+
+        <div class="field" id="field-birth_date">
+          <label class="field-label" for="birth_date">تاريخ الميلاد</label>
+          <input class="field-input" type="date" id="birth_date" name="birth_date">
+          <div class="field-error-text"></div>
+        </div>
+
+        <div class="field" id="field-grade">
+          <label class="field-label" for="grade">الصف الدراسي</label>
+          <select class="field-select" id="grade" name="grade" required>
+            <option value="" disabled selected>اختر الصف</option>
+            <option value="أولى ثانوي">أولى ثانوي</option>
+            <option value="ثانية ثانوي">ثانية ثانوي</option>
+            <option value="ثالثة ثانوي">ثالثة ثانوي</option>
+          </select>
+          <div class="field-error-text"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">اختر Avatar</label>
+          <div class="avatar-picker-grid" id="avatar-grid">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-avatar"></div>
+          </div>
+        </div>
+
+        <div class="field" id="field-referral_code">
+          <label class="field-label" for="referral_code">كود دعوة صديق (اختياري)</label>
+          <input class="field-input" type="text" id="referral_code" name="referral_code" placeholder="اتركه فارغًا إذا لم يكن لديك كود">
+          <div class="field-error-text"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg mt-2" id="register-submit">
+          <span class="btn-label">إنشاء الحساب</span>
+        </button>
+      </form>
+
+      <div class="auth-switch">
+        لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/validation.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/register.js"></script>
+</body>
+</html>

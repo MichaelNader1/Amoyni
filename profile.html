@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الملف الشخصي — Amoyni</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/reset.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/youth.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+  <header class="app-header">
+    <a href="dashboard.html" class="btn btn-icon btn-ghost" aria-label="رجوع">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="icon-mirror-rtl"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="brand">حسابي</div>
+    <span style="width:44px;"></span>
+  </header>
+
+  <main class="page-content">
+    <div class="profile-header">
+      <div class="avatar avatar-xl avatar-framed" id="profile-avatar"></div>
+      <div class="font-bold" style="font-size:var(--fs-lg);" id="profile-name">—</div>
+      <div class="text-sm text-muted" id="profile-phone">—</div>
+    </div>
+
+    <form id="profile-form" class="card">
+      <div class="field" id="field-full_name">
+        <label class="field-label" for="full_name">الاسم الكامل</label>
+        <input class="field-input" type="text" id="full_name" required>
+        <div class="field-error-text"></div>
+      </div>
+      <div class="field" id="field-grade">
+        <label class="field-label" for="grade">الصف الدراسي</label>
+        <select class="field-select" id="grade">
+          <option value="أولى ثانوي">أولى ثانوي</option>
+          <option value="ثانية ثانوي">ثانية ثانوي</option>
+          <option value="ثالثة ثانوي">ثالثة ثانوي</option>
+        </select>
+        <div class="field-error-text"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Avatar</label>
+        <div class="avatar-picker-grid" id="avatar-grid"></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="save-profile-btn"><span class="btn-label">حفظ التعديلات</span></button>
+    </form>
+
+    <div class="card mt-4" id="referral-card" style="display:none;">
+      <div class="section-title">ادعُ صديقك 🎉</div>
+      <p class="text-sm text-muted" id="referral-message"></p>
+      <div class="flex gap-2 mt-3">
+        <input class="field-input" id="referral-code-display" readonly style="font-weight:900;text-align:center;letter-spacing:3px;">
+        <button class="btn btn-secondary" id="copy-referral-btn">نسخ</button>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="section-title">تغيير كلمة المرور</div>
+      <p class="text-sm text-muted">مفيش تغيير كلمة مرور ذاتي حاليًا — لو نسيت كلمة المرور أو عايز تغيّرها، كلّم المسؤول عن الخدمة وهو هيغيّرها لك.</p>
+    </div>
+
+    <button class="btn btn-danger btn-block mt-6" id="logout-btn">تسجيل الخروج</button>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الرئيسية</a>
+    <a href="wallet.html"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg>المحفظة</a>
+    <div class="fab"><a href="scanner.html" class="fab-btn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 7V5a1 1 0 0 1 1-1h2M4 17v2a1 1 0 0 0 1 1h2M20 7V5a1 1 0 0 0-1-1h-2M20 17v2a1 1 0 0 1-1 1h-2M4 12h16" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></a></div>
+    <a href="leaderboard.html"><svg viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a2 2 0 0 0 2 4M17 6h3a2 2 0 0 1-2 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Leaderboard</a>
+    <a href="profile.html" class="is-active"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>حسابي</a>
+  </nav>
+
+  <script src="assets/vendor/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/validation.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/profile.js"></script>
+</body>
+</html>

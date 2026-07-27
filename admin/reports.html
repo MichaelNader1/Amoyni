@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>التقارير — Amoyni Admin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/youth.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <div class="main-with-sidebar">
+      <div class="admin-topbar">
+        <button class="btn btn-icon btn-ghost sidebar-toggle" id="sidebar-toggle-btn">☰</button>
+        <div class="admin-page-title" id="admin-page-title"></div>
+        <span style="width:44px;"></span>
+      </div>
+      <main class="page-content">
+        <div class="tab-strip">
+          <button data-tab="attendance" class="is-active">الحضور</button>
+          <button data-tab="points">النقاط</button>
+          <button data-tab="vouchers">Voucher</button>
+          <button data-tab="donations">التبرعات</button>
+        </div>
+
+        <div id="tab-attendance" class="report-panel">
+          <div class="card">
+            <div class="flex justify-between items-center mb-3">
+              <div class="section-title" style="margin:0;">تقرير الحضور حسب الاجتماع</div>
+              <button class="btn btn-secondary btn-sm" id="export-attendance">تصدير CSV</button>
+            </div>
+            <table class="responsive-table">
+              <thead><tr><th>الاجتماع</th><th>التاريخ</th><th>عدد الحضور</th><th>النقاط الموزعة</th></tr></thead>
+              <tbody id="report-attendance-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-points" class="report-panel" style="display:none;">
+          <div class="card">
+            <div class="flex justify-between items-center mb-3">
+              <div class="section-title" style="margin:0;">تقرير النقاط حسب النوع</div>
+              <button class="btn btn-secondary btn-sm" id="export-points">تصدير CSV</button>
+            </div>
+            <table class="responsive-table">
+              <thead><tr><th>النوع</th><th>إجمالي إضافة</th><th>إجمالي خصم</th><th>عدد العمليات</th></tr></thead>
+              <tbody id="report-points-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-vouchers" class="report-panel" style="display:none;">
+          <div class="card">
+            <div class="flex justify-between items-center mb-3">
+              <div class="section-title" style="margin:0;">تقرير الأكواد</div>
+              <button class="btn btn-secondary btn-sm" id="export-vouchers">تصدير CSV</button>
+            </div>
+            <table class="responsive-table">
+              <thead><tr><th>الكود</th><th>النقاط</th><th>الاستخدامات</th><th>الحالة</th></tr></thead>
+              <tbody id="report-vouchers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-donations" class="report-panel" style="display:none;">
+          <div class="card">
+            <div class="flex justify-between items-center mb-3">
+              <div class="section-title" style="margin:0;">تقرير التبرعات</div>
+              <button class="btn btn-secondary btn-sm" id="export-donations">تصدير CSV</button>
+            </div>
+            <table class="responsive-table">
+              <thead><tr><th>الحملة</th><th>المتبرع</th><th>المستفيد</th><th>القيمة</th><th>التاريخ</th></tr></thead>
+              <tbody id="report-donations-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <script src="../assets/vendor/supabase.js"></script>
+  <script src="../config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/admin/nav.js"></script>
+  <script src="../assets/js/admin/reports.js"></script>
+</body>
+</html>

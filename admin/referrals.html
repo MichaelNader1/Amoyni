@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الدعوات — Amoyni Admin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/youth.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <div class="main-with-sidebar">
+      <div class="admin-topbar">
+        <button class="btn btn-icon btn-ghost sidebar-toggle" id="sidebar-toggle-btn">☰</button>
+        <div class="admin-page-title" id="admin-page-title"></div>
+        <span style="width:44px;"></span>
+      </div>
+      <main class="page-content">
+        <form class="card mb-4" id="referral-settings-form">
+          <div class="flex justify-between items-center mb-3">
+            <div class="section-title" style="margin:0;">إعدادات دعوة الأصدقاء</div>
+            <label class="checkbox-row"><input type="checkbox" id="rs-enabled"><span class="text-sm">مفعّلة</span></label>
+          </div>
+          <div class="grid-1 sm-cols-2">
+            <div class="field"><label class="field-label">نقاط الداعي</label><input class="field-input" type="number" min="0" id="rs-inviter"></div>
+            <div class="field"><label class="field-label">نقاط المدعو</label><input class="field-input" type="number" min="0" id="rs-invitee"></div>
+          </div>
+          <div class="field"><label class="field-label">رسالة الدعوة</label><textarea class="field-textarea" id="rs-message"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block" id="rs-save"><span class="btn-label">حفظ الإعدادات</span></button>
+        </form>
+
+        <div class="kpi-grid mb-4" id="referral-kpis"></div>
+
+        <div class="card">
+          <div class="section-title">سجل الدعوات</div>
+          <table class="responsive-table">
+            <thead><tr><th>الداعي</th><th>المدعو</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+            <tbody id="referrals-tbody"><tr><td colspan="4"><div class="skeleton skeleton-text"></div></td></tr></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <script src="../assets/vendor/supabase.js"></script>
+  <script src="../config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/admin/nav.js"></script>
+  <script src="../assets/js/admin/referrals.js"></script>
+</body>
+</html>

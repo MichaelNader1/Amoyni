@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الإعدادات — Amoyni Admin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/youth.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <div class="main-with-sidebar">
+      <div class="admin-topbar">
+        <button class="btn btn-icon btn-ghost sidebar-toggle" id="sidebar-toggle-btn">☰</button>
+        <div class="admin-page-title" id="admin-page-title"></div>
+        <span style="width:44px;"></span>
+      </div>
+      <main class="page-content" style="max-width:560px;">
+        <form class="card" id="settings-form">
+          <div class="section-title">إعدادات الموقع العامة</div>
+          <div class="field"><label class="field-label">اسم التطبيق</label><input class="field-input" id="s-app_name"></div>
+          <div class="field"><label class="field-label">مهلة المسح (ثانية)</label><input class="field-input" type="number" id="s-scan_timeout_seconds" min="10"></div>
+          <div class="field"><label class="field-label">عدد أوائل Leaderboard</label><input class="field-input" type="number" id="s-leaderboard_limit" min="1"></div>
+          <label class="checkbox-row mb-4"><input type="checkbox" id="s-allow_multi_device_login"><span class="text-sm">السماح بتسجيل الدخول من أكثر من جهاز</span></label>
+          <button type="submit" class="btn btn-primary btn-block" id="settings-save"><span class="btn-label">حفظ الإعدادات</span></button>
+        </form>
+      </main>
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <script src="../assets/vendor/supabase.js"></script>
+  <script src="../config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/admin/nav.js"></script>
+  <script src="../assets/js/admin/settings.js"></script>
+</body>
+</html>
