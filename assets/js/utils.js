@@ -254,6 +254,26 @@ window.AmoyniUI = (function () {
     URL.revokeObjectURL(url);
   }
 
+  // --- Avatar image rendering with a safe fallback -----------------------
+  // Falls back to a simple colored initial-circle if the image URL 404s or
+  // fails to load for any reason (bad path, offline, slow network, etc.)
+  // so the user never sees a broken-image icon.
+  function avatarImgHtml(url, altText) {
+    const safeAlt = escapeHtml(altText || "");
+    if (!url) return avatarFallbackHtml(altText);
+    return (
+      '<img src="' + escapeHtml(url) + '" alt="' + safeAlt + '" ' +
+      'onerror="this.outerHTML=window.AmoyniUI.avatarFallbackHtml(\'' + safeAlt.replace(/'/g, "&#39;") + "')\">"
+    );
+  }
+  function avatarFallbackHtml(altText) {
+    const letter = (altText || "؟").trim().charAt(0).toUpperCase() || "؟";
+    return (
+      '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;' +
+      'background:var(--gradient-primary);color:#fff;font-weight:800;">' + escapeHtml(letter) + "</div>"
+    );
+  }
+
   return {
     toast,
     openModal,
@@ -269,5 +289,7 @@ window.AmoyniUI = (function () {
     friendlyError,
     toCSV,
     downloadCSV,
+    avatarImgHtml,
+    avatarFallbackHtml,
   };
 })();

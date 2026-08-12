@@ -1359,22 +1359,22 @@ where not exists (select 1 from referral_settings);
 -- 16 default avatars (placeholder image paths — replace with real assets)
 insert into avatars (name, image_url, is_default, sort_order)
 select * from (values
-  ('Avatar 1',  '/assets/avatars/avatar-01.png', true, 1),
-  ('Avatar 2',  '/assets/avatars/avatar-02.png', true, 2),
-  ('Avatar 3',  '/assets/avatars/avatar-03.png', true, 3),
-  ('Avatar 4',  '/assets/avatars/avatar-04.png', true, 4),
-  ('Avatar 5',  '/assets/avatars/avatar-05.png', true, 5),
-  ('Avatar 6',  '/assets/avatars/avatar-06.png', true, 6),
-  ('Avatar 7',  '/assets/avatars/avatar-07.png', true, 7),
-  ('Avatar 8',  '/assets/avatars/avatar-08.png', true, 8),
-  ('Avatar 9',  '/assets/avatars/avatar-09.png', true, 9),
-  ('Avatar 10', '/assets/avatars/avatar-10.png', true, 10),
-  ('Avatar 11', '/assets/avatars/avatar-11.png', true, 11),
-  ('Avatar 12', '/assets/avatars/avatar-12.png', true, 12),
-  ('Avatar 13', '/assets/avatars/avatar-13.png', true, 13),
-  ('Avatar 14', '/assets/avatars/avatar-14.png', true, 14),
-  ('Avatar 15', '/assets/avatars/avatar-15.png', true, 15),
-  ('Avatar 16', '/assets/avatars/avatar-16.png', true, 16)
+  ('Avatar 1',  'assets/avatars/avatar-01.png', true, 1),
+  ('Avatar 2',  'assets/avatars/avatar-02.png', true, 2),
+  ('Avatar 3',  'assets/avatars/avatar-03.png', true, 3),
+  ('Avatar 4',  'assets/avatars/avatar-04.png', true, 4),
+  ('Avatar 5',  'assets/avatars/avatar-05.png', true, 5),
+  ('Avatar 6',  'assets/avatars/avatar-06.png', true, 6),
+  ('Avatar 7',  'assets/avatars/avatar-07.png', true, 7),
+  ('Avatar 8',  'assets/avatars/avatar-08.png', true, 8),
+  ('Avatar 9',  'assets/avatars/avatar-09.png', true, 9),
+  ('Avatar 10', 'assets/avatars/avatar-10.png', true, 10),
+  ('Avatar 11', 'assets/avatars/avatar-11.png', true, 11),
+  ('Avatar 12', 'assets/avatars/avatar-12.png', true, 12),
+  ('Avatar 13', 'assets/avatars/avatar-13.png', true, 13),
+  ('Avatar 14', 'assets/avatars/avatar-14.png', true, 14),
+  ('Avatar 15', 'assets/avatars/avatar-15.png', true, 15),
+  ('Avatar 16', 'assets/avatars/avatar-16.png', true, 16)
 ) as v(name, image_url, is_default, sort_order)
 where not exists (select 1 from avatars);
 
@@ -2180,3 +2180,35 @@ end;
 $$;
 
 grant execute on function update_app_setting to anon, authenticated;
+
+-- =====================================================================
+-- ADDENDUM 2 — Dashboard spotlight (added after user testing feedback)
+-- =====================================================================
+-- Combined "today's meeting spotlight" for the youth dashboard: verse/announcement
+-- content plus the user's own raffle number if they already attended. Added because
+-- the verse/announcement and raffle number were only shown transiently on the
+-- post-scan success screen — the whole point is to pull youth into opening the app,
+-- so this needs to be a persistent, prominent home-page element.
+create or replace function get_my_meeting_card(p_user_id uuid)
+returns jsonb
+language sql
+security definer
+as $$
+  select case when m.id is null then 'null'::jsonb else
+    jsonb_build_object(
+      'meeting_id', m.id,
+      'title', m.title,
+      'content_type', m.content_type,
+      'verse_text', m.verse_text,
+      'announcement_text', m.announcement_text,
+      'has_attended', (ar.id is not null),
+      'points_awarded', ar.points_awarded,
+      'raffle_number', ar.raffle_number,
+      'raffle_enabled', m.raffle_enabled
+    )
+  end
+  from (select * from meetings where status = 'active' order by started_at desc limit 1) m
+  left join attendance_records ar on ar.meeting_id = m.id and ar.user_id = p_user_id;
+$$;
+
+grant execute on function get_my_meeting_card to anon, authenticated;

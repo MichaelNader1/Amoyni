@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>مسح الحضور — Amoyni</title>
-<link rel="icon" href="data:,">
+<link rel="icon" href="favicon.png">
 <link rel="stylesheet" href="assets/css/variables.css">
 <link rel="stylesheet" href="assets/css/reset.css">
 <link rel="stylesheet" href="assets/css/components.css">
@@ -23,26 +23,12 @@
   <main class="page-content">
     <!-- SCAN VIEW -->
     <div id="scan-view" class="scanner-shell">
-      <div class="scanner-tabs">
-        <button type="button" id="tab-camera" class="is-active">📷 الكاميرا</button>
-        <button type="button" id="tab-upload">🖼️ ارفع صورة الكود</button>
-      </div>
-
       <div id="camera-panel">
         <div class="scanner-viewport">
           <div id="qr-reader"></div>
           <div class="scanner-frame"><div class="scan-line"></div></div>
         </div>
         <p class="text-center text-sm text-muted mt-4">وجّه الكاميرا نحو كود الـQR المعروض في الاجتماع</p>
-      </div>
-
-      <div id="upload-panel" style="display:none;">
-        <div class="card text-center">
-          <p class="text-sm text-muted mb-3">اختر صورة كود الـQR من جهازك</p>
-          <input type="file" id="qr-file-input" accept="image/*" class="visually-hidden">
-          <button type="button" class="btn btn-secondary btn-block" id="qr-file-trigger">اختيار صورة</button>
-          <div id="qr-file-reader" class="visually-hidden"></div>
-        </div>
       </div>
 
       <div id="scan-status" class="card mt-4" style="display:none;"></div>

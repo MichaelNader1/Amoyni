@@ -38,7 +38,7 @@
       document.getElementById("full_name").value = profile.full_name;
       document.getElementById("grade").value = profile.grade;
       if (profile.avatar_image_url) {
-        document.getElementById("profile-avatar").innerHTML = '<img src="' + profile.avatar_image_url + '" alt="">';
+        document.getElementById("profile-avatar").innerHTML = window.AmoyniUI.avatarImgHtml(profile.avatar_image_url, profile.full_name);
       }
       selectedAvatarId = profile.avatar_id;
       renderAvatarGrid();
@@ -84,7 +84,7 @@
       window.AmoyniSession.updateYouth({ full_name: updated.full_name, grade: updated.grade, avatar_id: updated.avatar_id });
       document.getElementById("profile-name").textContent = updated.full_name;
       if (updated.avatar_image_url) {
-        document.getElementById("profile-avatar").innerHTML = '<img src="' + updated.avatar_image_url + '" alt="">';
+        document.getElementById("profile-avatar").innerHTML = window.AmoyniUI.avatarImgHtml(updated.avatar_image_url, updated.full_name);
       }
       window.AmoyniUI.toast("تم حفظ التعديلات", "success");
     } catch (err) {

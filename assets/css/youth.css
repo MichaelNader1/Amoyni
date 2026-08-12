@@ -52,6 +52,56 @@
 }
 @keyframes pulse-live { 0%,100% { box-shadow: 0 0 0 4px rgba(22,163,74,0.2);} 50% { box-shadow: 0 0 0 8px rgba(22,163,74,0.08);} }
 
+/* --- Dashboard spotlight: verse/announcement + raffle number, the main "reason to open the app" --- */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  background: linear-gradient(150deg, #1E3A8A 0%, #4C1D95 55%, #6D28D9 100%);
+  color: #fff;
+  box-shadow: var(--shadow-glow-blue);
+  animation: spotlight-in var(--dur-slow) var(--ease-bounce);
+}
+@keyframes spotlight-in { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.spotlight-card::before {
+  content: "";
+  position: absolute; inset: -30% -10% auto auto;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(251,191,36,0.35), transparent 65%);
+  filter: blur(6px);
+}
+.spotlight-kicker {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.16);
+  padding: 6px 14px; border-radius: var(--radius-full);
+  font-size: var(--fs-xs); font-weight: var(--fw-bold);
+  position: relative; z-index: 1;
+}
+.spotlight-text {
+  position: relative; z-index: 1;
+  font-size: var(--fs-xl);
+  line-height: 1.8;
+  font-weight: var(--fw-bold);
+  margin-top: var(--space-3);
+}
+.spotlight-raffle {
+  position: relative; z-index: 1;
+  margin-top: var(--space-5);
+  background: var(--gradient-gold);
+  color: var(--color-navy);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex; align-items: center; justify-content: space-between;
+  animation: raffle-reveal var(--dur-slow) var(--ease-bounce);
+}
+.spotlight-raffle .label { font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+.spotlight-raffle .number { font-size: var(--fs-2xl); font-weight: var(--fw-black); letter-spacing: 1px; }
+.spotlight-cta {
+  position: relative; z-index: 1;
+  margin-top: var(--space-5);
+}
+
 .quick-links-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
 .quick-link-card {
   display: flex; flex-direction: column; align-items: center; gap: var(--space-2);

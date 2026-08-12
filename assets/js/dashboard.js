@@ -22,7 +22,7 @@
     return "مساء النور";
   }
 
-  async function loadAvatar(avatarId, targets) {
+  async function loadAvatar(avatarId, targets, altText) {
     if (!avatarId) return;
     try {
       const rows = await window.AmoyniAPI.selectTable("avatars", {
@@ -31,7 +31,7 @@
       });
       if (rows && rows[0]) {
         targets.forEach(function (el) {
-          el.innerHTML = '<img src="' + rows[0].image_url + '" alt="avatar">';
+          el.innerHTML = window.AmoyniUI.avatarImgHtml(rows[0].image_url, altText);
         });
       }
     } catch (e) {
@@ -67,13 +67,52 @@
       .join("");
   }
 
+  function renderSpotlight(card) {
+    const section = document.getElementById("spotlight-section");
+    const noMeeting = document.getElementById("no-meeting-section");
+
+    if (!card) {
+      section.style.display = "none";
+      noMeeting.style.display = "block";
+      return;
+    }
+    noMeeting.style.display = "none";
+    section.style.display = "block";
+
+    const text = card.verse_text || card.announcement_text;
+    const kicker = card.content_type === "announcement" ? "📢 إعلان الاجتماع" : "📖 آية اليوم";
+
+    let html = '<div class="spotlight-card">';
+    html += '<div class="spotlight-kicker"><span class="dot-live"></span> ' + window.AmoyniUI.escapeHtml(card.title) + "</div>";
+    if (text) {
+      html += '<div class="spotlight-kicker" style="margin-top:8px;">' + kicker + "</div>";
+      html += '<div class="spotlight-text">' + window.AmoyniUI.escapeHtml(text) + "</div>";
+    }
+
+    if (card.has_attended) {
+      if (card.raffle_number) {
+        html +=
+          '<div class="spotlight-raffle"><span class="label">🎟️ رقم الطمبولة الخاص بيك</span>' +
+          '<span class="number">#' + card.raffle_number + "</span></div>";
+      } else if (card.raffle_enabled) {
+        html += '<div class="badge badge-warning mt-3">سجّلت حضورك، وأرقام الطمبولة خلصت</div>';
+      }
+    } else {
+      html +=
+        '<div class="spotlight-cta"><a href="scanner.html" class="btn btn-gold btn-block">' +
+        "امسح QR وسجّل حضورك دلوقتي</a></div>";
+    }
+    html += "</div>";
+    section.innerHTML = html;
+  }
+
   async function init() {
     document.getElementById("greeting-text").textContent = greet() + " 👋";
     document.getElementById("user-name").textContent = session.full_name || "";
 
     loadAvatar(session.avatar_id, [
       document.getElementById("header-avatar"),
-    ]);
+    ], session.full_name);
 
     try {
       const wallet = await window.AmoyniAPI.call("get_my_wallet", { p_user_id: session.user_id });
@@ -86,15 +125,10 @@
     }
 
     try {
-      const meeting = await window.AmoyniAPI.call("get_active_meeting", {});
-      if (meeting) {
-        document.getElementById("active-meeting-section").style.display = "block";
-        document.getElementById("no-meeting-section").style.display = "none";
-        document.getElementById("meeting-title").textContent = meeting.title;
-        document.getElementById("meeting-date").textContent = window.AmoyniUI.formatDate(meeting.meeting_date);
-      }
+      const card = await window.AmoyniAPI.call("get_my_meeting_card", { p_user_id: session.user_id });
+      renderSpotlight(card);
     } catch (err) {
-      /* silently keep "no active meeting" state */
+      renderSpotlight(null);
     }
   }
 

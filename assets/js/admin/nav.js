@@ -25,7 +25,7 @@ window.AmoyniAdminNav = (function () {
     const sidebar = document.getElementById("admin-sidebar");
     if (sidebar) {
       sidebar.innerHTML =
-        '<div class="brand"><span class="brand-mark">A</span> Amoyni Admin</div>' +
+        '<div class="brand"><span class="brand-mark" style="padding:0;overflow:hidden;"><img src="../assets/images/logo/amoyni-logo.png" alt="Amoyni" style="width:100%;height:100%;object-fit:cover;"></span> Amoyni Admin</div>' +
         '<nav>' +
         ITEMS.map(function (it) {
           return (

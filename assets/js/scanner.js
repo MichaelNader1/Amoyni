@@ -5,25 +5,23 @@
   const scanStatus = document.getElementById("scan-status");
   const scanView = document.getElementById("scan-view");
   const successView = document.getElementById("success-view");
-  const tabCamera = document.getElementById("tab-camera");
-  const tabUpload = document.getElementById("tab-upload");
-  const cameraPanel = document.getElementById("camera-panel");
-  const uploadPanel = document.getElementById("upload-panel");
 
   let html5Qrcode = null;
-  let fileScanner = null;
-  let cameraStarting = false;
   let isProcessing = false;
 
-  function showStatus(message, type) {
+  function showStatus(message, type, showRetry) {
     scanStatus.style.display = "block";
     scanStatus.className = "card mt-4";
     scanStatus.innerHTML =
-      '<div class="flex items-center gap-2 ' + (type === "error" ? "" : "") + '">' +
+      '<div class="flex items-center gap-2">' +
       (type === "error"
         ? '<span style="color:var(--color-danger)">⚠️</span>'
         : '<span class="spinner spinner-dark" style="width:18px;height:18px;"></span>') +
-      "<span class=\"text-sm\">" + window.AmoyniUI.escapeHtml(message) + "</span></div>";
+      '<span class="text-sm">' + window.AmoyniUI.escapeHtml(message) + "</span></div>" +
+      (showRetry ? '<button class="btn btn-secondary btn-block mt-3" id="retry-camera-btn">إعادة المحاولة</button>' : "");
+    if (showRetry) {
+      document.getElementById("retry-camera-btn").addEventListener("click", startCameraScan);
+    }
   }
   function hideStatus() {
     scanStatus.style.display = "none";
@@ -65,6 +63,10 @@
     } catch (err) {
       showStatus(window.AmoyniUI.friendlyError(err), "error");
       isProcessing = false;
+      // let them try scanning again after an error (e.g. already attended, timeout)
+      setTimeout(function () {
+        if (!html5Qrcode || !html5Qrcode.isScanning) startCameraScan();
+      }, 500);
     }
   }
 
@@ -97,11 +99,14 @@
 
   async function startCameraScan() {
     hideStatus();
+    isProcessing = false;
     try {
-      html5Qrcode = new Html5Qrcode("qr-reader");
+      if (!html5Qrcode) html5Qrcode = new Html5Qrcode("qr-reader");
+      if (html5Qrcode.isScanning) return;
+
       const cameras = await Html5Qrcode.getCameras();
       if (!cameras || !cameras.length) {
-        showStatus("لم يتم العثور على كاميرا، جرّب رفع صورة الكود بدلًا من ذلك.", "error");
+        showStatus("لم يتم العثور على كاميرا في هذا الجهاز.", "error", true);
         return;
       }
       const scanStartedAt = new Date().toISOString();
@@ -112,55 +117,13 @@
           handleDecodedText(decodedText, scanStartedAt);
         },
         function () {
-          /* ignore per-frame scan failures */
+          /* ignore per-frame scan failures, this fires continuously while scanning */
         }
       );
     } catch (err) {
-      showStatus("تعذّر تشغيل الكاميرا. تأكد من إعطاء إذن الوصول، أو استخدم رفع صورة الكود.", "error");
+      showStatus("تعذّر تشغيل الكاميرا. تأكد من إعطاء إذن الوصول للكاميرا من إعدادات المتصفح.", "error", true);
     }
   }
 
-  function initUploadTab() {
-    const fileInput = document.getElementById("qr-file-input");
-    document.getElementById("qr-file-trigger").addEventListener("click", function () {
-      fileInput.click();
-    });
-    fileInput.addEventListener("change", async function () {
-      const file = fileInput.files[0];
-      if (!file) return;
-      const scanStartedAt = new Date().toISOString();
-      showStatus("جارِ قراءة الكود من الصورة...", "loading");
-
-      await stopCamera(); // make sure the camera instance is fully idle first
-
-      try {
-        if (!fileScanner) fileScanner = new Html5Qrcode("qr-file-reader");
-        const res = await fileScanner.scanFileV2(file, false);
-        handleDecodedText(res.decodedText, scanStartedAt);
-      } catch (e) {
-        showStatus("تعذّر قراءة كود QR من هذه الصورة، جرّب صورة أوضح.", "error");
-      }
-      fileInput.value = "";
-    });
-  }
-
-  tabCamera.addEventListener("click", function () {
-    tabCamera.classList.add("is-active");
-    tabUpload.classList.remove("is-active");
-    cameraPanel.style.display = "block";
-    uploadPanel.style.display = "none";
-    hideStatus();
-    if (!html5Qrcode || !html5Qrcode.isScanning) startCameraScan();
-  });
-  tabUpload.addEventListener("click", async function () {
-    tabUpload.classList.add("is-active");
-    tabCamera.classList.remove("is-active");
-    cameraPanel.style.display = "none";
-    uploadPanel.style.display = "block";
-    hideStatus();
-    await stopCamera();
-  });
-
-  initUploadTab();
   startCameraScan();
 })();
