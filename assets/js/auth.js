@@ -1,9 +1,8 @@
 // =====================================================================
 // Amoyni — Session Management (youth + admin)
-// Custom auth model: no Supabase Auth session, just a small session
-// object saved locally after a successful youth_login / admin_login
-// RPC call. "Remember me" checked -> localStorage (persists after the
-// browser is closed). Unchecked -> sessionStorage (cleared on close).
+// Custom auth model backed by opaque server-issued session tokens.
+// The database stores only SHA-256 token hashes; the browser stores the
+// one-time plaintext token returned by youth_login/admin_login.
 // =====================================================================
 window.AmoyniSession = (function () {
   const YOUTH_KEY = "amoyni_youth_session";
@@ -33,6 +32,10 @@ window.AmoyniSession = (function () {
   function clear(key) {
     localStorage.removeItem(key);
     sessionStorage.removeItem(key);
+  }
+
+  function hasServerToken(session) {
+    return !!(session && typeof session.session_token === "string" && /^[0-9a-f]{64}$/i.test(session.session_token));
   }
 
   return {
@@ -65,7 +68,8 @@ window.AmoyniSession = (function () {
     // Call at the top of every youth-protected page.
     requireYouth(redirectTo) {
       const s = this.getYouth();
-      if (!s) {
+      if (!hasServerToken(s)) {
+        this.clearYouth();
         window.location.replace(redirectTo || "login.html");
         return null;
       }
@@ -75,7 +79,8 @@ window.AmoyniSession = (function () {
     // Call at the top of every admin-protected page.
     requireAdmin(redirectTo) {
       const s = this.getAdmin();
-      if (!s) {
+      if (!hasServerToken(s)) {
+        this.clearAdmin();
         window.location.replace(redirectTo || "login.html");
         return null;
       }
@@ -83,19 +88,41 @@ window.AmoyniSession = (function () {
     },
 
     redirectIfYouthLoggedIn(target) {
-      if (this.getYouth()) window.location.replace(target || "dashboard.html");
+      const session = this.getYouth();
+      if (hasServerToken(session)) window.location.replace(target || "dashboard.html");
+      else if (session) this.clearYouth();
     },
     redirectIfAdminLoggedIn(target) {
-      if (this.getAdmin()) window.location.replace(target || "index.html");
+      const session = this.getAdmin();
+      if (hasServerToken(session)) window.location.replace(target || "index.html");
+      else if (session) this.clearAdmin();
     },
 
-    youthLogout(redirectTo) {
-      this.clearYouth();
-      window.location.replace(redirectTo || "login.html");
+    async youthLogout(redirectTo) {
+      const session = this.getYouth();
+      try {
+        if (hasServerToken(session) && window.AmoyniAPI) {
+          await window.AmoyniAPI.call("logout_app_session", { p_session_token: session.session_token });
+        }
+      } catch (error) {
+        // Local logout must still complete if the network/session already expired.
+      } finally {
+        this.clearYouth();
+        window.location.replace(redirectTo || "login.html");
+      }
     },
-    adminLogout(redirectTo) {
-      this.clearAdmin();
-      window.location.replace(redirectTo || "login.html");
+    async adminLogout(redirectTo) {
+      const session = this.getAdmin();
+      try {
+        if (hasServerToken(session) && window.AmoyniAPI) {
+          await window.AmoyniAPI.call("logout_app_session", { p_session_token: session.session_token });
+        }
+      } catch (error) {
+        // Local logout must still complete if the network/session already expired.
+      } finally {
+        this.clearAdmin();
+        window.location.replace(redirectTo || "login.html");
+      }
     },
   };
 })();

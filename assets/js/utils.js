@@ -195,8 +195,13 @@ window.AmoyniUI = (function () {
     MEETING_NOT_ACTIVE: "لا يوجد اجتماع نشط الآن.",
     MEETING_NOT_DRAFT: "لا يمكن التعديل بعد بدء الاجتماع.",
     INVALID_TOKEN: "كود QR غير صالح لهذا الاجتماع.",
-    SCAN_TIMEOUT: "انتهت مهلة المسح (60 ثانية)، حاول مسح الكود مرة أخرى.",
+    INVALID_QR_FORMAT: "صيغة كود QR غير صحيحة.",
+    ATTENDANCE_NOT_STARTED: "لم يبدأ وقت تسجيل الحضور بعد.",
+    ATTENDANCE_ENDED: "انتهى وقت تسجيل الحضور لهذا الاجتماع.",
     ALREADY_ATTENDED: "لقد سجلت حضورك في هذا الاجتماع بالفعل.",
+    ACTIVE_MEETING_EXISTS: "يوجد اجتماع نشط بالفعل. أغلقه قبل بدء اجتماع آخر.",
+    UNAUTHENTICATED: "انتهت جلسة تسجيل الدخول. سجّل الدخول مرة أخرى.",
+    UNAUTHORIZED: "ليس لديك صلاحية لتنفيذ هذه العملية.",
     USER_NOT_FOUND: "المستخدم غير موجود.",
     VOUCHER_NOT_FOUND: "الكود غير صحيح.",
     VOUCHER_INACTIVE: "هذا الكود متوقف حاليًا.",
@@ -215,12 +220,41 @@ window.AmoyniUI = (function () {
 
   function friendlyError(err) {
     if (!err) return "حدث خطأ غير متوقع.";
+    const stableCode = (err.code || "").trim();
+    const SQLSTATE_MESSAGES = {
+      AM001: ERROR_MESSAGES.UNAUTHENTICATED,
+      AM002: ERROR_MESSAGES.MEETING_NOT_FOUND,
+      AM003: ERROR_MESSAGES.MEETING_NOT_ACTIVE,
+      AM004: ERROR_MESSAGES.INVALID_TOKEN,
+      AM005: ERROR_MESSAGES.ATTENDANCE_NOT_STARTED,
+      AM006: ERROR_MESSAGES.ATTENDANCE_ENDED,
+      AM007: ERROR_MESSAGES.ALREADY_ATTENDED,
+      AM008: ERROR_MESSAGES.ACCOUNT_DISABLED,
+      AM009: ERROR_MESSAGES.ACTIVE_MEETING_EXISTS,
+      AM010: ERROR_MESSAGES.UNAUTHORIZED,
+    };
+    if (SQLSTATE_MESSAGES[stableCode]) return SQLSTATE_MESSAGES[stableCode];
     const raw = (err.message || err.details || "").trim();
     for (const code in ERROR_MESSAGES) {
       if (raw.indexOf(code) !== -1) return ERROR_MESSAGES[code];
     }
     if (raw) return raw;
     return "حدث خطأ غير متوقع، حاول مرة أخرى.";
+  }
+
+  function friendlyAttendanceError(err) {
+    const attendanceCodes = [
+      "UNAUTHENTICATED", "UNAUTHORIZED", "MEETING_NOT_FOUND", "MEETING_NOT_ACTIVE",
+      "INVALID_TOKEN", "ATTENDANCE_NOT_STARTED", "ATTENDANCE_ENDED",
+      "ALREADY_ATTENDED", "ACCOUNT_DISABLED",
+    ];
+    const raw = ((err && (err.message || err.details)) || "").trim();
+    const stableCodes = ["AM001", "AM002", "AM003", "AM004", "AM005", "AM006", "AM007", "AM008", "AM010"];
+    if (err && stableCodes.indexOf(err.code) !== -1) return friendlyError(err);
+    for (let i = 0; i < attendanceCodes.length; i++) {
+      if (raw.indexOf(attendanceCodes[i]) !== -1) return friendlyError(err);
+    }
+    return "تعذّر تسجيل الحضور بسبب خطأ غير متوقع. حاول مرة أخرى أو تواصل مع المسؤول.";
   }
 
   // --- CSV export (UTF-8 with BOM so Excel renders Arabic correctly) ---
@@ -287,6 +321,7 @@ window.AmoyniUI = (function () {
     formatNumber,
     escapeHtml,
     friendlyError,
+    friendlyAttendanceError,
     toCSV,
     downloadCSV,
     avatarImgHtml,

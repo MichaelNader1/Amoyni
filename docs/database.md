@@ -2,8 +2,8 @@
 
 الملف الكامل: `supabase/amoyni_supabase_setup.sql` (ملف واحد، يُشغَّل من `SQL Editor` في Supabase).
 
-## الجداول (15 جدول)
-`profiles` · `admin_users` · `avatars` · `meetings` · `meeting_point_rules` ·
+## الجداول (16 جدول)
+`profiles` · `admin_users` · `app_sessions` · `avatars` · `meetings` · `meeting_point_rules` ·
 `attendance_records` · `point_transactions` · `vouchers` · `voucher_redemptions` ·
 `referral_settings` · `referrals` · `donation_campaigns` · `donation_transactions` ·
 `app_settings` · `audit_logs`
@@ -12,15 +12,16 @@
 
 ## نموذج الصلاحيات (Authentication & RLS) — مهم جدًا
 المشروع يستخدم **مصادقة مخصّصة (Custom Auth)** برقم الهاتف/كلمة المرور، وليس Supabase Auth
-(لأن المطلوب تسجيل بدون بريد إلكتروني أو OTP). ولأن `auth.uid()` غير متاح في هذا النموذج،
-تم اعتماد التصميم التالي:
+(لأن المطلوب تسجيل بدون بريد إلكتروني أو OTP). دوال الدخول تصدر token عشوائيًا وتخزن بصمته
+SHA-256 فقط في `app_sessions`. دوال الحضور وإدارة الاجتماع تستخرج الهوية من هذه الجلسة ولا
+تثق في UUID يرسله العميل.
 
 - **RLS مفعّل على كل الجداول.**
 - الجداول الحساسة (profiles, point_transactions, vouchers, audit_logs, ...) **لا تملك أي Policy
   للقراءة/الكتابة المباشرة** من `anon`/`authenticated` — أي محاولة `select`/`insert` مباشرة عليها من الواجهة سترفض.
-- كل قراءة أو تعديل يتم فقط عبر **Functions بصلاحية `SECURITY DEFINER`** (تتجاوز RLS داخليًا وتقوم
-  بالتحقق من الصلاحيات بنفسها باستخدام الـ id الذي يرسله الطرف الآخر).
-- جداول القراءة العامة الآمنة فقط (`avatars`, `meetings` النشطة/المغلقة, `donation_campaigns` النشطة/المغلقة)
+- كل قراءة أو تعديل يتم فقط عبر **Functions بصلاحية `SECURITY DEFINER`**. دوال الحضور والاجتماعات
+  الحساسة تستخدم جلسة مخزنة في السيرفر، مع `search_path` صريح وآمن.
+- جداول القراءة العامة الآمنة فقط (`avatars`, `donation_campaigns` النشطة/المغلقة)
   لها Policy مباشرة للقراءة لأنها لا تحتوي على بيانات حساسة.
 
 هذا يعني: أي عملية جديدة تحتاجها الواجهة **يجب** أن تمر عبر function جديدة بدلاً من محاولة قراءة

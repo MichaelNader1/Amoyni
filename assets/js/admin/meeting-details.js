@@ -77,7 +77,7 @@
     list.querySelectorAll("[data-delete-rule]").forEach(function (btn) {
       btn.addEventListener("click", async function () {
         try {
-          await window.AmoyniAPI.call("delete_point_rule", { p_admin_id: admin.admin_id, p_rule_id: btn.dataset.deleteRule });
+          await window.AmoyniAPI.call("delete_point_rule", { p_admin_session_token: admin.session_token, p_rule_id: btn.dataset.deleteRule });
           load();
         } catch (err) {
           window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
@@ -121,7 +121,7 @@
 
   async function load() {
     try {
-      const data = await window.AmoyniAPI.call("get_meeting_details", { p_meeting_id: meetingId });
+      const data = await window.AmoyniAPI.call("get_meeting_details", { p_admin_session_token: admin.session_token, p_meeting_id: meetingId });
       renderHeader(data.meeting);
       renderRules(data.point_rules);
       renderAttendance(data.attendance);
@@ -140,7 +140,7 @@
     }
     try {
       await window.AmoyniAPI.call("add_point_rule", {
-        p_admin_id: admin.admin_id,
+        p_admin_session_token: admin.session_token,
         p_meeting_id: meetingId,
         p_start_time: new Date(start).toISOString(),
         p_end_time: new Date(end).toISOString(),
@@ -158,7 +158,7 @@
   document.getElementById("start-meeting-btn").addEventListener("click", function () {
     window.AmoyniUI.confirmAction("بدء الاجتماع", "بعد البدء لن تقدر تعدّل شرائح النقاط. متأكد؟", async function () {
       try {
-        await window.AmoyniAPI.call("start_meeting", { p_admin_id: admin.admin_id, p_meeting_id: meetingId });
+        await window.AmoyniAPI.call("start_meeting", { p_admin_session_token: admin.session_token, p_meeting_id: meetingId });
         window.AmoyniUI.toast("تم بدء الاجتماع، QR جاهز الآن", "success");
         load();
       } catch (err) {
@@ -170,7 +170,7 @@
   document.getElementById("close-meeting-btn").addEventListener("click", function () {
     window.AmoyniUI.confirmAction("إغلاق الاجتماع", "لن يستطيع أي شاب تسجيل حضوره بعد الإغلاق. متأكد؟", async function () {
       try {
-        await window.AmoyniAPI.call("close_meeting", { p_admin_id: admin.admin_id, p_meeting_id: meetingId });
+        await window.AmoyniAPI.call("close_meeting", { p_admin_session_token: admin.session_token, p_meeting_id: meetingId });
         window.AmoyniUI.toast("تم إغلاق الاجتماع", "success");
         load();
       } catch (err) {

@@ -13,10 +13,10 @@
 
   // Sensible defaults: today, next couple of hours
   const now = new Date();
-  document.getElementById("meeting_date").value = now.toISOString().slice(0, 10);
-  document.getElementById("attendance_start").value = now.toISOString().slice(0, 16);
+  document.getElementById("meeting_date").value = window.AmoyniDateTime.toLocalDateValue(now);
+  document.getElementById("attendance_start").value = window.AmoyniDateTime.toLocalDateTimeValue(now);
   const end = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-  document.getElementById("attendance_end").value = end.toISOString().slice(0, 16);
+  document.getElementById("attendance_end").value = window.AmoyniDateTime.toLocalDateTimeValue(end);
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -45,11 +45,11 @@
     window.AmoyniUI.setButtonLoading(submitBtn, true);
     try {
       const result = await window.AmoyniAPI.call("create_meeting", {
-        p_admin_id: admin.admin_id,
+        p_admin_session_token: admin.session_token,
         p_title: title,
         p_meeting_date: meetingDate,
-        p_attendance_start: new Date(start).toISOString(),
-        p_attendance_end: new Date(end).toISOString(),
+        p_attendance_start: window.AmoyniDateTime.localDateTimeToIso(start),
+        p_attendance_end: window.AmoyniDateTime.localDateTimeToIso(end),
         p_content_type: document.getElementById("content_type").value,
         p_verse_text: document.getElementById("verse_text").value.trim() || null,
         p_announcement_text: document.getElementById("announcement_text").value.trim() || null,
