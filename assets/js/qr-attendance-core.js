@@ -77,11 +77,5 @@
     };
   }
 
-  function raffleState(result) {
-    if (!result || !result.raffle_enabled) return "disabled";
-    if (result.raffle_number !== null && result.raffle_number !== undefined) return "assigned";
-    return result.raffle_exhausted ? "exhausted" : "enabled";
-  }
-
-  return { parsePayload: parsePayload, createScannerState: createScannerState, raffleState: raffleState };
+  return { parsePayload: parsePayload, createScannerState: createScannerState };
 });

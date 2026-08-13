@@ -45,7 +45,7 @@
     window.AmoyniUI.setButtonLoading(submitBtn, true);
     try {
       const result = await window.AmoyniAPI.call("create_meeting", {
-        p_admin_session_token: admin.session_token,
+        p_admin_id: admin.admin_id,
         p_title: title,
         p_meeting_date: meetingDate,
         p_attendance_start: window.AmoyniDateTime.localDateTimeToIso(start),

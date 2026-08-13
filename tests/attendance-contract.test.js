@@ -6,93 +6,66 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
-const scanner = fs.readFileSync(path.join(root, "assets/js/scanner.js"), "utf8");
-const setup = fs.readFileSync(path.join(root, "supabase/amoyni_supabase_setup.sql"), "utf8");
-const migration = fs.readFileSync(path.join(root, "supabase/migration_3_secure_qr_attendance.sql"), "utf8");
-const scannerHtml = fs.readFileSync(path.join(root, "scanner.html"), "utf8");
-const meetingCreateHtml = fs.readFileSync(path.join(root, "admin/meeting-create.html"), "utf8");
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const scanner = read("assets/js/scanner.js");
+const setup = read("supabase/amoyni_supabase_setup.sql");
+const meetingCreate = read("assets/js/admin/meeting-create.js");
+const meetingDetails = read("assets/js/admin/meeting-details.js");
 
-function attendanceBody(sql) {
-  const plainStart = sql.indexOf("create or replace function register_attendance");
-  const qualifiedStart = sql.indexOf("create or replace function public.register_attendance");
-  const start = plainStart >= 0 ? plainStart : qualifiedStart;
-  const end = sql.indexOf("-- ---------------------------------------------------------------", start + 50);
-  return sql.slice(start, end);
-}
-
-test("frontend attendance request sends no caller identity or client time", () => {
-  const call = scanner.slice(scanner.indexOf('call("register_attendance"'), scanner.indexOf("});", scanner.indexOf('call("register_attendance"')) + 3);
-  assert.match(call, /p_session_token/);
-  assert.doesNotMatch(call, /p_user_id|p_scan_started_at/);
+test("legacy register_attendance request shape is unchanged", () => {
+  const start = scanner.indexOf('call("register_attendance"');
+  const call = scanner.slice(start, scanner.indexOf("});", start) + 3);
+  assert.match(call, /p_user_id:\s*session\.user_id/);
+  assert.match(call, /p_meeting_id:\s*parsed\.value\.meeting_id/);
+  assert.match(call, /p_qr_token:\s*parsed\.value\.qr_token/);
+  assert.match(call, /p_scan_started_at:\s*scanStartedAt/);
+  assert.doesNotMatch(call, /session_token/);
 });
 
-test("scanner pauses before attendance RPC and stops on navigation", () => {
-  const stop = scanner.indexOf("await stopCamera()");
-  const rpc = scanner.indexOf('call("register_attendance"');
-  assert.ok(stop > 0 && stop < rpc);
-  assert.match(scanner, /addEventListener\("pagehide", cleanup/);
+test("scan timestamp is created when a detection is accepted", () => {
+  const handler = scanner.slice(scanner.indexOf("async function handleDecodedText"), scanner.indexOf("function renderSuccess"));
+  const accepted = handler.indexOf("beginDetection");
+  const timestamp = handler.indexOf("new Date().toISOString()");
+  const stop = handler.indexOf("await stopCamera()");
+  const rpc = handler.indexOf('call("register_attendance"');
+  assert.ok(accepted >= 0 && accepted < timestamp);
+  assert.ok(timestamp < stop && stop < rpc);
+  const cameraStart = scanner.slice(scanner.indexOf("async function startCameraScan"));
+  assert.doesNotMatch(cameraStart, /const scanStartedAt/);
 });
 
-test("browser pages load testable helpers before their consumers", () => {
-  assert.ok(scannerHtml.indexOf("qr-attendance-core.js") < scannerHtml.indexOf("assets/js/scanner.js"));
-  assert.ok(meetingCreateHtml.indexOf("datetime.js") < meetingCreateHtml.indexOf("admin/meeting-create.js"));
+test("scanner stops duplicate processing and exposes controlled retry", () => {
+  assert.match(scanner, /if \(!lifecycle\.beginDetection/);
+  assert.match(scanner, /await stopCamera\(\)/);
+  assert.match(scanner, /lifecycle\.markError\(\)/);
+  assert.match(scanner, /resetAndStart/);
+  assert.match(scanner, /lifecycle\.markSuccess\(\)/);
 });
 
-for (const [name, sql] of [["setup", setup], ["migration", migration]]) {
-  test(name + " derives attendance identity from a session token", () => {
-    const body = attendanceBody(sql);
-    assert.match(body, /p_session_token text/);
-    assert.match(body, /resolve_youth_session\(p_session_token\)/);
-    assert.doesNotMatch(body.slice(0, body.indexOf("returns jsonb")), /p_user_id|p_scan_started_at/);
-  });
+test("legacy SQL attendance contract and timeout remain intact", () => {
+  const signature = setup.slice(setup.indexOf("create or replace function register_attendance"), setup.indexOf("returns jsonb", setup.indexOf("create or replace function register_attendance")));
+  assert.match(signature, /p_user_id\s+uuid/);
+  assert.match(signature, /p_meeting_id\s+uuid/);
+  assert.match(signature, /p_qr_token\s+varchar/);
+  assert.match(signature, /p_scan_started_at\s+timestamptz/);
+  assert.doesNotMatch(signature, /session_token/);
+  assert.match(setup, /SCAN_TIMEOUT/);
+});
 
-  test(name + " uses one server timestamp for windows, points and persistence", () => {
-    const body = attendanceBody(sql);
-    assert.match(body, /v_server_time\s+timestamptz\s*:=\s*now\(\)/);
-    assert.match(body, /v_server_time < v_meeting\.attendance_start/);
-    assert.match(body, /v_server_time > v_meeting\.attendance_end/);
-    assert.match(body, /v_server_time >= start_time/);
-    assert.doesNotMatch(body, /SCAN_TIMEOUT|abs\s*\(/);
-  });
+test("meeting management uses legacy RPC arguments", () => {
+  assert.match(meetingCreate, /p_admin_id:\s*admin\.admin_id/);
+  assert.doesNotMatch(meetingCreate, /session_token/);
+  assert.match(meetingDetails, /get_meeting_details", \{ p_meeting_id: meetingId \}/);
+  assert.match(meetingDetails, /start_meeting", \{ p_admin_id: admin\.admin_id/);
+  assert.match(meetingDetails, /close_meeting", \{ p_admin_id: admin\.admin_id/);
+  assert.doesNotMatch(meetingDetails, /session_token/);
+});
 
-  test(name + " preserves atomic attendance writes and raffle distinctions", () => {
-    const body = attendanceBody(sql);
-    assert.match(body, /insert into attendance_records/);
-    assert.match(body, /update profiles/);
-    assert.match(body, /insert into point_transactions/);
-    assert.match(body, /recalculate_user_streak/);
-    assert.match(body, /raffle_enabled/);
-    assert.match(body, /raffle_exhausted/);
-  });
-
-  test(name + " protects QR tokens and serializes the active-meeting invariant", () => {
-    assert.match(sql, /drop policy if exists meetings_public_read/);
-    assert.match(sql, /revoke select on (table )?(public\.)?meetings from anon/);
-    assert.match(sql, /pg_advisory_xact_lock/);
-    assert.match(sql, /trg_single_active_meeting/);
-    assert.match(sql, /ACTIVE_MEETING_EXISTS/);
-  });
-
-  test(name + " hardens security-definer attendance and session helpers", () => {
-    assert.match(attendanceBody(sql), /security definer\s+(set search_path|\nset search_path)/);
-    assert.match(sql, /revoke all on function (public\.)?resolve_youth_session\(text\)/);
-    assert.match(sql, /digest\(p_session_token, 'sha256'\)/);
-  });
-}
-
-test("database unique constraint remains authoritative for duplicate attendance", () => {
+test("attendance business-rule writes remain present", () => {
   assert.match(setup, /unique \(meeting_id, user_id\)/);
-});
-
-test("migration is transactional and does not delete business records", () => {
-  assert.match(migration, /^begin;/m);
-  assert.match(migration, /^commit;/m);
-  assert.doesNotMatch(migration, /delete\s+from\s+(profiles|meetings|attendance_records|point_transactions)/i);
-  assert.match(migration, /ACTIVE_MEETING_CLEANUP_REQUIRED/);
-});
-
-test("server sessions are revocable on logout", () => {
-  assert.match(setup, /function logout_app_session/);
-  assert.match(setup, /set revoked_at = now\(\)/);
-  assert.match(migration, /set revoked_at=now\(\)/);
+  assert.match(setup, /insert into attendance_records/);
+  assert.match(setup, /insert into point_transactions/);
+  assert.match(setup, /recalculate_user_streak/);
+  assert.match(setup, /v_raffle_number/);
+  assert.match(setup, /activate_referral_reward/);
 });

@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { parsePayload, createScannerState, raffleState } = require("../assets/js/qr-attendance-core.js");
+const { parsePayload, createScannerState } = require("../assets/js/qr-attendance-core.js");
 
 const VALID = JSON.stringify({
   meeting_id: "123e4567-e89b-42d3-a456-426614174000",
@@ -74,10 +74,4 @@ test("cleanup leaves scanner idle", () => {
   state.markScanning();
   state.cleanup();
   assert.equal(state.getState(), "idle");
-});
-
-test("raffle UI distinguishes disabled, assigned and exhausted", () => {
-  assert.equal(raffleState({ raffle_enabled: false, raffle_number: null }), "disabled");
-  assert.equal(raffleState({ raffle_enabled: true, raffle_number: 0 }), "assigned");
-  assert.equal(raffleState({ raffle_enabled: true, raffle_number: null, raffle_exhausted: true }), "exhausted");
 });

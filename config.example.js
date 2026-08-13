@@ -20,6 +20,7 @@ window.AMOYNI_CONFIG = {
   SUPABASE_ANON_KEY: "YOUR-ANON-PUBLIC-KEY",
 
   // Local/dev-only fallbacks (safe defaults, can be overridden by app_settings in DB)
+  SCAN_TIMEOUT_SECONDS: 60,
   LEADERBOARD_LIMIT: 10,
   DEFAULT_LANGUAGE: "ar",
 };

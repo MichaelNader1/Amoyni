@@ -40,13 +40,9 @@
     return "كود QR غير صالح. امسح كود الحضور المعروض للاجتماع وحاول مرة أخرى.";
   }
 
-  function isSessionError(error) {
-    const raw = (error && (error.message || error.details)) || "";
-    return error && (error.code === "AM001" || error.code === "AM010" || /UNAUTHENTICATED|UNAUTHORIZED/.test(raw));
-  }
-
   async function handleDecodedText(decodedText) {
     if (!lifecycle.beginDetection(decodedText, Date.now())) return;
+    const scanStartedAt = new Date().toISOString();
     showStatus("جارِ التحقق من الكود وتسجيل الحضور...", "loading");
     await stopCamera();
 
@@ -59,21 +55,16 @@
 
     try {
       const result = await window.AmoyniAPI.call("register_attendance", {
-        p_session_token: session.session_token,
+        p_user_id: session.user_id,
         p_meeting_id: parsed.value.meeting_id,
         p_qr_token: parsed.value.qr_token,
+        p_scan_started_at: scanStartedAt,
       });
       lifecycle.markSuccess();
       renderSuccess(result);
     } catch (error) {
       lifecycle.markError();
-      if (isSessionError(error)) {
-        window.AmoyniSession.clearYouth();
-        showStatus(window.AmoyniUI.friendlyAttendanceError(error), "error", false);
-        scanStatus.insertAdjacentHTML("beforeend", '<a class="btn btn-primary btn-block mt-3" href="login.html">تسجيل الدخول</a>');
-      } else {
-        showStatus(window.AmoyniUI.friendlyAttendanceError(error), "error", true);
-      }
+      showStatus(window.AmoyniUI.friendlyError(error), "error", true);
     }
   }
 
@@ -84,11 +75,10 @@
     document.getElementById("new-balance").textContent = window.AmoyniUI.formatNumber(result.balance_after || 0);
     document.getElementById("new-streak").textContent = result.streak || 0;
 
-    const raffleState = window.AmoyniQR.raffleState(result);
-    if (raffleState === "assigned") {
+    if (result.raffle_number) {
       document.getElementById("raffle-block").style.display = "block";
       document.getElementById("raffle-number").textContent = "#" + result.raffle_number;
-    } else if (raffleState === "exhausted") {
+    } else {
       document.getElementById("raffle-exhausted-note").style.display = "inline-flex";
     }
 

@@ -25,6 +25,7 @@
         <form class="card" id="settings-form">
           <div class="section-title">إعدادات الموقع العامة</div>
           <div class="field"><label class="field-label">اسم التطبيق</label><input class="field-input" id="s-app_name"></div>
+          <div class="field"><label class="field-label">مهلة المسح (ثانية)</label><input class="field-input" type="number" id="s-scan_timeout_seconds" min="10"></div>
           <div class="field"><label class="field-label">عدد أوائل Leaderboard</label><input class="field-input" type="number" id="s-leaderboard_limit" min="1"></div>
           <label class="checkbox-row mb-4"><input type="checkbox" id="s-allow_multi_device_login"><span class="text-sm">السماح بتسجيل الدخول من أكثر من جهاز</span></label>
           <button type="submit" class="btn btn-primary btn-block" id="settings-save"><span class="btn-label">حفظ الإعدادات</span></button>
