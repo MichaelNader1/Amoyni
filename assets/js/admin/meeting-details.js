@@ -64,9 +64,10 @@
     list.innerHTML = rules
       .map(function (r) {
         return (
-          '<div class="flex justify-between items-center" style="padding:8px 0;border-bottom:1px solid var(--color-border);">' +
-          '<div class="text-sm">' + window.AmoyniUI.formatDateTime(r.start_time) + " → " + window.AmoyniUI.formatDateTime(r.end_time) + "</div>" +
-          '<div class="flex items-center gap-2"><span class="badge badge-info">' + r.points + " نقطة</span>" +
+          '<div class="point-rule-summary">' +
+          '<div class="point-rule-summary-time"><span class="text-xs text-muted">من</span><span class="text-sm">' + window.AmoyniUI.formatDateTime(r.start_time) + '</span></div>' +
+          '<div class="point-rule-summary-time"><span class="text-xs text-muted">إلى</span><span class="text-sm">' + window.AmoyniUI.formatDateTime(r.end_time) + '</span></div>' +
+          '<div class="point-rule-summary-actions"><span class="badge badge-info">' + r.points + " نقطة</span>" +
           (currentMeeting && currentMeeting.status === "draft"
             ? '<button class="btn btn-icon btn-ghost btn-sm" data-delete-rule="' + r.id + '">🗑️</button>'
             : "") +
@@ -121,6 +122,12 @@
 
   async function load() {
     try {
+      const query = new URLSearchParams(window.location.search);
+      if (query.get("rules_save_error") === "1") {
+        const failedRule = parseInt(query.get("failed_rule"), 10);
+        window.AmoyniUI.toast("تم إنشاء الاجتماع، لكن تعذر حفظ بعض شرائح النقاط بدءًا من الشريحة رقم " + (Number.isFinite(failedRule) ? failedRule : "المطلوبة") + ". راجع الشرائح وأكملها هنا.", "error");
+        window.history.replaceState({}, "", "meeting-details.html?id=" + encodeURIComponent(meetingId));
+      }
       const data = await window.AmoyniAPI.call("get_meeting_details", { p_meeting_id: meetingId });
       renderHeader(data.meeting);
       renderRules(data.point_rules);

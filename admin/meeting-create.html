@@ -21,7 +21,7 @@
         <div class="admin-page-title" id="admin-page-title"></div>
         <span style="width:44px;"></span>
       </div>
-      <main class="page-content" style="max-width:640px;">
+      <main class="page-content meeting-form-page">
         <form id="create-meeting-form" class="card">
           <div class="field" id="field-title">
             <label class="field-label">اسم اليوم / الاجتماع</label>
@@ -78,6 +78,19 @@
             </div>
           </div>
 
+          <section class="point-rule-editor" aria-labelledby="create-point-rules-title">
+            <div class="flex justify-between items-center gap-3 mb-3">
+              <div>
+                <div class="section-title" id="create-point-rules-title" style="margin:0;">شرائح نقاط الحضور</div>
+                <p class="text-xs text-muted mt-1">اختياري — حدد النقاط حسب وقت تسجيل الحضور.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="add-create-rule-btn">إضافة شريحة</button>
+            </div>
+            <div id="create-rules-list" class="point-rule-editor-list"></div>
+            <div id="create-rules-empty" class="point-rule-empty text-sm text-muted">لم تتم إضافة شرائح. الحضور سيمنح 0 نقطة ما لم تضفها لاحقًا.</div>
+            <div id="create-rules-error" class="point-rule-error" role="alert" aria-live="polite"></div>
+          </section>
+
           <button type="submit" class="btn btn-primary btn-block btn-lg mt-2" id="create-submit">
             <span class="btn-label">إنشاء الاجتماع (Draft)</span>
           </button>
@@ -96,6 +109,7 @@
   <script src="../assets/js/validation.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/datetime.js"></script>
+  <script src="../assets/js/meeting-point-rules.js"></script>
   <script src="../assets/js/admin/nav.js"></script>
   <script src="../assets/js/admin/meeting-create.js"></script>
 </body>
