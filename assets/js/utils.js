@@ -80,11 +80,11 @@ window.AmoyniUI = (function () {
         if (opts.onCancel) opts.onCancel();
       });
     overlay.querySelector('[data-action="confirm"]').addEventListener("click", function () {
-      close();
       if (opts.onConfirm) opts.onConfirm();
+      close();
     });
 
-    return { close };
+    return { close, overlay };
   }
 
   function confirmAction(title, body, onConfirm, opts) {

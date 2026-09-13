@@ -22,46 +22,53 @@
   async function loadAttendance() {
     const rows = await window.AmoyniAPI.call("get_admin_meetings", {});
     cache.attendance = rows;
-    document.getElementById("report-attendance-tbody").innerHTML = rows
-      .map(function (m) {
-        return (
-          "<tr><td data-label=\"الاجتماع\">" + window.AmoyniUI.escapeHtml(m.title) + "</td>" +
-          '<td data-label="التاريخ">' + window.AmoyniUI.formatDate(m.meeting_date) + "</td>" +
-          '<td data-label="عدد الحضور">' + m.attendance_count + "</td>" +
-          '<td data-label="النقاط الموزعة">' + m.total_points_awarded + "</td></tr>"
-        );
-      })
-      .join("");
+    document.getElementById("report-attendance-tbody").innerHTML = rows.length
+      ? rows
+          .map(function (m) {
+            return (
+              "<tr><td data-label=\"الاجتماع\">" + window.AmoyniUI.escapeHtml(m.title) + "</td>" +
+              '<td data-label="التاريخ">' + window.AmoyniUI.formatDate(m.meeting_date) + "</td>" +
+              '<td data-label="عدد الحضور">' + m.attendance_count + "</td>" +
+              '<td data-label="النقاط الموزعة">' + m.total_points_awarded + "</td></tr>"
+            );
+          })
+          .join("")
+      : '<tr><td colspan="4"><div class="text-sm text-muted">لا توجد اجتماعات بعد</div></td></tr>';
   }
 
   async function loadPoints() {
     const rows = await window.AmoyniAPI.call("get_report_points_breakdown", {});
     cache.points = rows;
-    document.getElementById("report-points-tbody").innerHTML = rows
-      .map(function (r) {
-        return (
-          "<tr><td data-label=\"النوع\">" + r.type + "</td>" +
-          '<td data-label="إجمالي إضافة">' + (r.total_credit || 0) + "</td>" +
-          '<td data-label="إجمالي خصم">' + (r.total_debit || 0) + "</td>" +
-          '<td data-label="عدد العمليات">' + r.tx_count + "</td></tr>"
-        );
-      })
-      .join("");
+    document.getElementById("report-points-tbody").innerHTML = rows.length
+      ? rows
+          .map(function (r) {
+            return (
+              "<tr><td data-label=\"النوع\">" + window.AmoyniUI.escapeHtml(r.type) + "</td>" +
+              '<td data-label="إجمالي إضافة">' + (r.total_credit || 0) + "</td>" +
+              '<td data-label="إجمالي خصم">' + (r.total_debit || 0) + "</td>" +
+              '<td data-label="عدد العمليات">' + r.tx_count + "</td></tr>"
+            );
+          })
+          .join("")
+      : '<tr><td colspan="4"><div class="text-sm text-muted">لا توجد عمليات بعد</div></td></tr>';
   }
 
   async function loadVouchers() {
     const rows = await window.AmoyniAPI.call("get_admin_vouchers", {});
     cache.vouchers = rows;
-    document.getElementById("report-vouchers-tbody").innerHTML = rows
-      .map(function (v) {
-        return (
-          "<tr><td data-label=\"الكود\">" + v.code + "</td>" +
-          '<td data-label="النقاط">' + v.points + "</td>" +
-          '<td data-label="الاستخدامات">' + v.used_count + " / " + v.max_uses + "</td>" +
-          '<td data-label="الحالة">' + v.status + "</td></tr>"
-        );
-      })
-      .join("");
+    const statusLabel = { active: "نشط", paused: "متوقف", exhausted: "منتهي" };
+    document.getElementById("report-vouchers-tbody").innerHTML = rows.length
+      ? rows
+          .map(function (v) {
+            return (
+              "<tr><td data-label=\"الكود\">" + window.AmoyniUI.escapeHtml(v.code) + "</td>" +
+              '<td data-label="النقاط">' + window.AmoyniUI.formatNumber(v.points) + "</td>" +
+              '<td data-label="الاستخدامات">' + v.used_count + " / " + v.max_uses + "</td>" +
+              '<td data-label="الحالة">' + (statusLabel[v.status] || window.AmoyniUI.escapeHtml(v.status)) + "</td></tr>"
+            );
+          })
+          .join("")
+      : '<tr><td colspan="4"><div class="text-sm text-muted">لا توجد أكواد بعد</div></td></tr>';
   }
 
   async function loadDonations() {

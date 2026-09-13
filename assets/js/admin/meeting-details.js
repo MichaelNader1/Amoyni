@@ -28,9 +28,10 @@
     document.getElementById("add-rule-form").style.display = m.status === "draft" ? "block" : "none";
     document.getElementById("rules-locked-note").style.display = m.status === "draft" ? "none" : "block";
 
-    if (m.status === "active" && m.qr_token) {
-      document.getElementById("qr-section").style.display = "block";
-      renderQR(m.id, m.qr_token);
+    const qrSection = document.getElementById("qr-section");
+    if (qrSection) {
+      qrSection.style.display = m.status === "active" && m.qr_token ? "block" : "none";
+      if (m.status === "active" && m.qr_token) renderQR(m.id, m.qr_token);
     }
   }
 
@@ -89,6 +90,20 @@
 
   function renderAttendance(rows) {
     const tbody = document.getElementById("attendance-tbody");
+    document.getElementById("export-attendance-btn").onclick = function () {
+      if (!rows.length) {
+        window.AmoyniUI.toast("لا يوجد حضور لتصديره بعد", "warning");
+        return;
+      }
+      window.AmoyniUI.downloadCSV("attendance-" + meetingId, rows, [
+        { key: "full_name", label: "الاسم" },
+        { key: "phone", label: "الهاتف" },
+        { key: "grade", label: "الصف" },
+        { key: "created_at", label: "الوقت" },
+        { key: "points_awarded", label: "النقاط" },
+        { key: "raffle_number", label: "رقم الطمبولة" },
+      ]);
+    };
     if (!rows.length) {
       tbody.innerHTML = '<tr><td colspan="6"><div class="state-block"><div class="state-title">لا يوجد حضور بعد</div></div></td></tr>';
       return;
@@ -107,17 +122,6 @@
         );
       })
       .join("");
-
-    document.getElementById("export-attendance-btn").onclick = function () {
-      window.AmoyniUI.downloadCSV("attendance-" + meetingId, rows, [
-        { key: "full_name", label: "الاسم" },
-        { key: "phone", label: "الهاتف" },
-        { key: "grade", label: "الصف" },
-        { key: "created_at", label: "الوقت" },
-        { key: "points_awarded", label: "النقاط" },
-        { key: "raffle_number", label: "رقم الطمبولة" },
-      ]);
-    };
   }
 
   async function load() {
@@ -141,10 +145,21 @@
     const start = document.getElementById("rule-start").value;
     const end = document.getElementById("rule-end").value;
     const points = parseInt(document.getElementById("rule-points").value, 10);
+    const ruleBtn = document.getElementById("add-rule-btn");
     if (!start || !end || isNaN(points)) {
       window.AmoyniUI.toast("املأ كل حقول الشريحة", "error");
       return;
     }
+    if (new Date(end) <= new Date(start)) {
+      window.AmoyniUI.toast("وقت النهاية يجب أن يكون بعد البداية", "error");
+      return;
+    }
+    if (points < 0) {
+      window.AmoyniUI.toast("عدد النقاط يجب ألا يكون سالبًا", "error");
+      return;
+    }
+    if (ruleBtn.disabled) return;
+    window.AmoyniUI.setButtonLoading(ruleBtn, true);
     try {
       await window.AmoyniAPI.call("add_point_rule", {
         p_admin_id: admin.admin_id,
@@ -159,6 +174,8 @@
       load();
     } catch (err) {
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+    } finally {
+      window.AmoyniUI.setButtonLoading(ruleBtn, false);
     }
   });
 

@@ -7,6 +7,7 @@
   const submitBtn = document.getElementById("login-submit");
   const togglePw = document.getElementById("toggle-password");
   const pwInput = document.getElementById("password");
+  let submitting = false;
 
   togglePw.addEventListener("click", function () {
     pwInput.type = pwInput.type === "password" ? "text" : "password";
@@ -30,6 +31,8 @@
       hasError = true;
     }
     if (hasError) return;
+    if (submitting) return;
+    submitting = true;
 
     window.AmoyniUI.setButtonLoading(submitBtn, true);
     try {
@@ -40,6 +43,7 @@
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
     } finally {
       window.AmoyniUI.setButtonLoading(submitBtn, false);
+      submitting = false;
     }
   });
 })();

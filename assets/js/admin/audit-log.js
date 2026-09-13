@@ -13,8 +13,8 @@
       tbody.innerHTML = rows
         .map(function (r) {
           return (
-            "<tr><td data-label=\"المسؤول\">" + (r.admin_username || "—") + "</td>" +
-            '<td data-label="الإجراء"><span class="badge badge-info">' + r.action + "</span></td>" +
+            "<tr><td data-label=\"المسؤول\">" + window.AmoyniUI.escapeHtml(r.admin_username || "—") + "</td>" +
+            '<td data-label="الإجراء"><span class="badge badge-info">' + window.AmoyniUI.escapeHtml(r.action) + "</span></td>" +
             '<td data-label="الوصف">' + window.AmoyniUI.escapeHtml(r.description || "") + "</td>" +
             '<td data-label="التاريخ">' + window.AmoyniUI.formatDateTime(r.created_at) + "</td></tr>"
           );

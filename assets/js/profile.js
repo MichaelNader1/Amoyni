@@ -55,11 +55,19 @@
   }
   init();
 
-  document.getElementById("copy-referral-btn").addEventListener("click", function () {
+  document.getElementById("copy-referral-btn").addEventListener("click", async function () {
     const input = document.getElementById("referral-code-display");
     input.select();
-    navigator.clipboard && navigator.clipboard.writeText(input.value);
-    window.AmoyniUI.toast("تم نسخ الكود", "success");
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(input.value);
+      } else if (!document.execCommand("copy")) {
+        throw new Error("clipboard unavailable");
+      }
+      window.AmoyniUI.toast("تم نسخ الكود", "success");
+    } catch (err) {
+      window.AmoyniUI.toast("تعذّر النسخ تلقائيًا، حدّد الكود وانسخه يدويًا", "warning");
+    }
   });
 
   document.getElementById("profile-form").addEventListener("submit", async function (e) {

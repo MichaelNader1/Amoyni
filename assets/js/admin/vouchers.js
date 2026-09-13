@@ -17,15 +17,15 @@
         .map(function (v) {
           return (
             "<tr>" +
-            '<td data-label="الكود" class="font-bold">' + v.code + "</td>" +
-            '<td data-label="النقاط">' + v.points + "</td>" +
+            '<td data-label="الكود" class="font-bold">' + window.AmoyniUI.escapeHtml(v.code) + "</td>" +
+            '<td data-label="النقاط">' + window.AmoyniUI.formatNumber(v.points) + "</td>" +
             '<td data-label="الاستخدامات">' + v.used_count + " / " + v.max_uses + "</td>" +
             '<td data-label="المتبقي">' + v.remaining_uses + "</td>" +
             '<td data-label="الحالة"><span class="badge ' + (v.status === "active" ? "badge-success" : v.status === "paused" ? "badge-warning" : "badge-neutral") + '">' + STATUS_LABEL[v.status] + "</span></td>" +
             '<td>' +
             (v.status === "active"
               ? '<button class="btn btn-secondary btn-sm" data-pause="' + v.voucher_id + '">إيقاف</button>'
-              : v.status === "paused"
+              : v.status === "paused" || v.status === "exhausted"
               ? '<button class="btn btn-secondary btn-sm" data-activate="' + v.voucher_id + '">تفعيل</button>'
               : "") +
             "</td></tr>"
@@ -48,17 +48,23 @@
   }
 
   async function setStatus(id, status) {
+    const btn = document.querySelector('[data-pause="' + id + '"], [data-activate="' + id + '"]');
+    if (btn && btn.disabled) return;
+    if (btn) window.AmoyniUI.setButtonLoading(btn, true);
     try {
       await window.AmoyniAPI.call("set_voucher_status", { p_admin_id: admin.admin_id, p_voucher_id: id, p_status: status });
       window.AmoyniUI.toast("تم التحديث", "success");
       load();
     } catch (err) {
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+    } finally {
+      if (btn) window.AmoyniUI.setButtonLoading(btn, false);
     }
   }
 
   document.getElementById("new-voucher-btn").addEventListener("click", function () {
-    window.AmoyniUI.openModal({
+    let saving = false;
+    const modalHandle = window.AmoyniUI.openModal({
       title: "إنشاء كود جديد",
       bodyHtml:
         '<div class="field" style="margin-bottom:10px;"><label class="field-label">الكود</label><input class="field-input" id="nv-code" placeholder="WELCOME50"></div>' +
@@ -68,6 +74,7 @@
       confirmLabel: "إنشاء",
       cancelLabel: "إلغاء",
       onConfirm: async function () {
+        if (saving) return;
         const code = document.getElementById("nv-code").value.trim();
         const points = parseInt(document.getElementById("nv-points").value, 10);
         const max = parseInt(document.getElementById("nv-max").value, 10);
@@ -76,6 +83,9 @@
           window.AmoyniUI.toast("املأ كل الحقول", "error");
           return;
         }
+        const confirmBtn = modalHandle.overlay.querySelector("[data-action='confirm']");
+        saving = true;
+        if (confirmBtn) window.AmoyniUI.setButtonLoading(confirmBtn, true);
         try {
           await window.AmoyniAPI.call("create_voucher", {
             p_admin_id: admin.admin_id,
@@ -86,9 +96,13 @@
             p_internal_note: null,
           });
           window.AmoyniUI.toast("تم إنشاء الكود", "success");
+          modalHandle.close();
           load();
         } catch (err) {
           window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+        } finally {
+          saving = false;
+          if (confirmBtn) window.AmoyniUI.setButtonLoading(confirmBtn, false);
         }
       },
     });

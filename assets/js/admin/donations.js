@@ -93,7 +93,8 @@
     }
     const options = users.map(function (u) { return '<option value="' + u.id + '">' + window.AmoyniUI.escapeHtml(u.full_name) + " — " + u.phone + "</option>"; }).join("");
 
-    window.AmoyniUI.openModal({
+    let saving = false;
+    const modalHandle = window.AmoyniUI.openModal({
       title: "حملة تبرع جديدة",
       bodyHtml:
         '<div class="field" style="margin-bottom:10px;"><label class="field-label">عنوان الحملة</label><input class="field-input" id="nc-title"></div>' +
@@ -102,6 +103,7 @@
       confirmLabel: "إنشاء وتفعيل",
       cancelLabel: "إلغاء",
       onConfirm: async function () {
+        if (saving) return;
         const title = document.getElementById("nc-title").value.trim();
         const desc = document.getElementById("nc-desc").value.trim();
         const beneficiary = document.getElementById("nc-beneficiary").value;
@@ -109,6 +111,9 @@
           window.AmoyniUI.toast("العنوان والمستفيد مطلوبين", "error");
           return;
         }
+        const confirmBtn = modalHandle.overlay.querySelector("[data-action='confirm']");
+        saving = true;
+        if (confirmBtn) window.AmoyniUI.setButtonLoading(confirmBtn, true);
         try {
           await window.AmoyniAPI.call("create_donation_campaign", {
             p_admin_id: admin.admin_id,
@@ -118,9 +123,13 @@
             p_image_url: null,
           });
           window.AmoyniUI.toast("تم إنشاء الحملة", "success");
+          modalHandle.close();
           load();
         } catch (err) {
           window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+        } finally {
+          saving = false;
+          if (confirmBtn) window.AmoyniUI.setButtonLoading(confirmBtn, false);
         }
       },
     });

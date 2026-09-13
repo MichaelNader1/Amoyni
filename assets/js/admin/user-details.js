@@ -14,7 +14,7 @@
     currentStatus = profile.status;
     document.getElementById("user-summary").innerHTML =
       '<div class="flex items-center gap-3">' +
-      '<div class="avatar avatar-lg avatar-framed">' + (profile.avatar_image_url ? '<img src="' + profile.avatar_image_url + '">' : "") + "</div>" +
+      '<div class="avatar avatar-lg avatar-framed">' + window.AmoyniUI.avatarImgHtml(profile.avatar_image_url, profile.full_name) + "</div>" +
       '<div><div class="font-bold" style="font-size:var(--fs-lg);">' + window.AmoyniUI.escapeHtml(profile.full_name) + "</div>" +
       '<div class="text-sm text-muted">' + profile.phone + " · " + (profile.grade || "") + "</div>" +
       (profile.status === "active" ? '<span class="badge badge-success mt-1">نشط</span>' : '<span class="badge badge-danger mt-1">معطل</span>') +
@@ -71,14 +71,24 @@
 
   document.getElementById("edit-user-form").addEventListener("submit", async function (e) {
     e.preventDefault();
+    const fullName = document.getElementById("edit-full_name").value.trim();
+    const phone = document.getElementById("edit-phone").value.trim();
+    if (!window.AmoyniValidate.isRequired(fullName)) {
+      window.AmoyniValidate.setFieldError(document.getElementById("edit-full_name").closest(".field"), "الاسم مطلوب");
+      return;
+    }
+    if (!window.AmoyniValidate.isPhone(phone)) {
+      window.AmoyniValidate.setFieldError(document.getElementById("edit-phone").closest(".field"), "رقم هاتف مصري غير صحيح");
+      return;
+    }
     const btn = document.getElementById("save-user-btn");
     window.AmoyniUI.setButtonLoading(btn, true);
     try {
       await window.AmoyniAPI.call("admin_update_user", {
         p_admin_id: admin.admin_id,
         p_user_id: userId,
-        p_full_name: document.getElementById("edit-full_name").value.trim(),
-        p_phone: document.getElementById("edit-phone").value.trim(),
+        p_full_name: fullName,
+        p_phone: phone,
         p_birth_date: document.getElementById("edit-birth_date").value || null,
         p_grade: document.getElementById("edit-grade").value,
         p_avatar_id: null,

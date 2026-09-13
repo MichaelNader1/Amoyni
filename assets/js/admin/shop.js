@@ -80,6 +80,9 @@
   async function toggleAvailability(id) {
     const product = products.find(function (p) { return p.id === id; });
     if (!product) return;
+    const btn = document.querySelector('[data-availability="' + id + '"]');
+    if (btn && btn.disabled) return;
+    if (btn) window.AmoyniUI.setButtonLoading(btn, true);
     try {
       await window.AmoyniAPI.call("update_shop_product", {
         p_admin_id: admin.admin_id,
@@ -96,6 +99,8 @@
       loadProducts();
     } catch (err) {
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+    } finally {
+      if (btn) window.AmoyniUI.setButtonLoading(btn, false);
     }
   }
 
@@ -114,12 +119,14 @@
       '<div class="field" style="margin-bottom:10px;"><label class="field-label">الحد الأقصى لكل شاب (اختياري — فارغ = بدون حد)</label><input class="field-input" type="number" min="1" id="pf-limit" value="' + (p.max_per_user === undefined || p.max_per_user === null ? "" : p.max_per_user) + '"><div class="field-error-text"></div></div>' +
       '<div class="checkbox-row"><input type="checkbox" id="pf-available" ' + (p.is_available === undefined || p.is_available ? "checked" : "") + '><label>متاح للشراء</label></div>';
 
-    window.AmoyniUI.openModal({
+    let saving = false;
+    const modalHandle = window.AmoyniUI.openModal({
       title: editing ? "تعديل منتج" : "منتج جديد",
       bodyHtml: bodyHtml,
       confirmLabel: editing ? "حفظ التغييرات" : "إنشاء",
       cancelLabel: "إلغاء",
       onConfirm: async function () {
+        if (saving) return;
         const values = {
           name: document.getElementById("pf-name").value,
           description: document.getElementById("pf-desc").value.trim(),
@@ -146,8 +153,6 @@
             }
           }
           window.AmoyniUI.toast("راجع الحقول المخطئة", "error");
-          const formCheck = document.body.querySelector("[data-action='confirm']");
-          if (formCheck) window.AmoyniUI.setButtonLoading(formCheck, false);
           return;
         }
         const payload = {
@@ -160,6 +165,9 @@
           p_is_available: values.is_available,
           p_max_per_user: values.max_per_user === "" ? null : Number(values.max_per_user),
         };
+        const confirmBtn = modalHandle.overlay.querySelector("[data-action='confirm']");
+        saving = true;
+        if (confirmBtn) window.AmoyniUI.setButtonLoading(confirmBtn, true);
         try {
           if (editing) {
             payload.p_product_id = product.id;
@@ -169,9 +177,13 @@
             await window.AmoyniAPI.call("create_shop_product", payload);
             window.AmoyniUI.toast("تم إنشاء المنتج", "success");
           }
+          modalHandle.close();
           loadProducts();
         } catch (err) {
           window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+        } finally {
+          saving = false;
+          if (confirmBtn) window.AmoyniUI.setButtonLoading(confirmBtn, false);
         }
       },
     });
@@ -217,6 +229,9 @@
     const current = purchases.find(function (p) { return p.id === id; });
     if (!current) return;
     const next = !current.is_delivered;
+    const btn = document.querySelector('[data-deliver="' + id + '"]');
+    if (btn && btn.disabled) return;
+    if (btn) window.AmoyniUI.setButtonLoading(btn, true);
     try {
       await window.AmoyniAPI.call("admin_set_purchase_delivered", {
         p_admin_id: admin.admin_id,
@@ -227,6 +242,8 @@
       loadPurchases();
     } catch (err) {
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
+    } finally {
+      if (btn) window.AmoyniUI.setButtonLoading(btn, false);
     }
   }
 

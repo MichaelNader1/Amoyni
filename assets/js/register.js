@@ -5,6 +5,7 @@
   const avatarGrid = document.getElementById("avatar-grid");
   const submitBtn = document.getElementById("register-submit");
   let selectedAvatarId = null;
+  let submitting = false;
 
   // Pre-fill referral code from ?ref=CODE in the URL, if a friend shared a link
   const params = new URLSearchParams(window.location.search);
@@ -75,6 +76,8 @@
       hasError = true;
     }
     if (hasError) return;
+    if (submitting) return;
+    submitting = true;
 
     window.AmoyniUI.setButtonLoading(submitBtn, true);
     try {
@@ -96,6 +99,7 @@
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
     } finally {
       window.AmoyniUI.setButtonLoading(submitBtn, false);
+      submitting = false;
     }
   });
 })();

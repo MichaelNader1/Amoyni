@@ -13,6 +13,7 @@
 
   let balance = 0;
   let products = [];
+  let buying = false;
 
   function renderBalance() {
     balanceValueEl.innerHTML = window.AmoyniUI.formatNumber(balance) + '<span class="hero-balance-unit"> نقطة</span>';
@@ -78,6 +79,7 @@
 
   // ----- Buy flow ----------------------------------------------------
   function openBuyConfirm(product) {
+    if (buying) return;
     const state = core.computeProductState(product, { balance: balance });
     if (!state.buyable) {
       window.AmoyniUI.toast(state.label, "warning");
@@ -99,6 +101,8 @@
   }
 
   async function doBuy(product) {
+    if (buying) return;
+    buying = true;
     try {
       const result = await window.AmoyniAPI.call("purchase_shop_product", {
         p_user_id: session.user_id,
@@ -112,16 +116,19 @@
     } catch (err) {
       window.AmoyniUI.toast(window.AmoyniUI.friendlyError(err), "error");
       loadProducts();
+    } finally {
+      buying = false;
     }
   }
 
   // ----- History -----------------------------------------------------
   function renderHistory(list) {
+    window.__shopOwnPurchases = list || [];
     if (!list || !list.length) {
       purchasesEl.innerHTML = '<div class="state-block" style="padding:var(--space-6) 0;"><div class="state-title" style="font-size:var(--fs-md);">لم تشترِ أي مكافأة بعد</div></div>';
+      if (products.length) renderProducts(products);
       return;
     }
-    window.__shopOwnPurchases = list;
     purchasesEl.innerHTML = list
       .map(function (pu) {
         return (
@@ -136,6 +143,7 @@
         );
       })
       .join("");
+    if (products.length) renderProducts(products);
   }
 
   async function loadHistory() {
