@@ -152,3 +152,10 @@
 .tab-strip { display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-4); }
 .tab-strip button { padding: 10px 16px; font-weight: var(--fw-bold); color: var(--color-text-muted); border-bottom: 2px solid transparent; }
 .tab-strip button.is-active { color: var(--color-blue); border-color: var(--color-blue); }
+
+.product-thumb {
+  width: 44px; height: 44px; border-radius: var(--radius-sm);
+  object-fit: cover; background: var(--color-surface-alt);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.product-thumb-empty { color: var(--color-text-muted); font-weight: var(--fw-bold); }

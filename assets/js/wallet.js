@@ -9,6 +9,7 @@
     referral_invitee: "مكافأة انضمام",
     donation_sent: "تبرع مُرسل",
     donation_received: "تبرع مُستلم",
+    shop_purchase: "شراء من المتجر",
     admin_addition: "إضافة من الأدمن",
     admin_deduction: "خصم من الأدمن",
     reversal: "تصحيح",

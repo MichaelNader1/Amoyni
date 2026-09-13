@@ -29,6 +29,11 @@ python3 -m http.server 8080
 تحت `supabase/`، شغّلها هي بس:
 - `supabase/migration_2_dashboard_spotlight.sql` — يضيف كارت "آية/إعلان اليوم + رقم
   الطمبولة" في الصفحة الرئيسية، ويصلّح مسارات صور الـAvatars. آمن يتشغّل أكتر من مرة.
+- `supabase/migration_4_shop.sql` — يضيف متجر النقاط (نظام المكافآت): جدولا
+  `shop_products` و `shop_purchases` + 8 دوال RPC (شراء ذرّي آمن بدون خسارة نقاط)،
+  وتعديلات إضافية فقط على `point_transactions`/`sync_wallet_totals`/`get_my_transactions`.
+  صفحات المتجر: `shop.html` (شباب) و `admin/shop.html` (إدارة المنتجات وسجل المشتريات).
+  يتضمن آلاف الاختبارات التلقائية في `tests/shop.test.js`.
 
 ## بيانات تجريبية (Demo)
 | النوع | القيمة |
@@ -40,9 +45,9 @@ python3 -m http.server 8080
 ```
 amoyni/
 ├── index.html, login.html, register.html, dashboard.html, wallet.html,
-│   leaderboard.html, scanner.html, voucher.html, donations.html,
+│   leaderboard.html, scanner.html, voucher.html, donations.html, shop.html,
 │   profile.html, attendance-history.html          ← صفحات الشباب
-├── admin/                                          ← لوحة تحكم الأدمن (15 صفحة)
+├── admin/                                          ← لوحة تحكم الأدمن (16 صفحة)
 ├── assets/
 │   ├── css/        ← Design System كامل (tokens, components, responsive, RTL)
 │   ├── js/         ← منطق الصفحات + admin/ للوحة التحكم
@@ -60,6 +65,9 @@ Supabase JS SDK v2 (مُحمّل محليًا) · Supabase PostgreSQL + PostgRES
 canvas-confetti · qrcode-generator (MIT) — **بدون** React/Vue/Next.js/Build Tools.
 
 ## آخر التحديثات
+- ✅ متجر النقاط (نظام المكافآت): الشباب يشتري المكافآت من رصيد النقاط شراءً ذرّيًا آمنًا
+  (حماية من نفاد الكمية/الرصيد وازدواجية الشراء)، مع سجل مشتريات دائم (Snapshots) ولوحة أدمن
+  لإدارة المنتجات وحالة التسليم. في `shop.html` + `admin/shop.html` + `migration_4_shop.sql`.
 - ✅ صلّحنا قائمة الأدمن على الموبايل (كانت الـDrawer ناقصة تنسيقها بالكامل).
 - ✅ ظهور الآية/الإعلان ورقم الطمبولة بشكل بارز في الصفحة الرئيسية لكل شاب (كارت "Spotlight").
 - ✅ شيلنا خيار "رفع صورة" من صفحة المسح — الكاميرا بقت الطريقة الوحيدة، مع زرار "إعادة المحاولة".

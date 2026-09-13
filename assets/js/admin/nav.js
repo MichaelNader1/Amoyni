@@ -12,6 +12,7 @@ window.AmoyniAdminNav = (function () {
     { key: "vouchers", href: "vouchers.html", label: "Vouchers", icon: "🎟️" },
     { key: "referrals", href: "referrals.html", label: "الدعوات", icon: "🔗" },
     { key: "donations", href: "donations.html", label: "التبرعات", icon: "❤️" },
+    { key: "shop", href: "shop.html", label: "متجر النقاط", icon: "🛍️" },
     { key: "leaderboard", href: "leaderboard.html", label: "Leaderboard", icon: "🏆" },
     { key: "reports", href: "reports.html", label: "التقارير", icon: "📊" },
     { key: "audit-log", href: "audit-log.html", label: "سجل العمليات", icon: "📜" },

@@ -243,3 +243,31 @@
 
 /* --- Profile --- */
 .profile-header { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); text-align: center; margin-bottom: var(--space-6); }
+
+/* --- Shop (points rewards) --- */
+.shop-balance-hero .hero-balance { font-size: var(--fs-3xl); font-variant-numeric: tabular-nums; }
+.shop-balance-hero .hero-balance-unit { font-size: var(--fs-md); font-weight: var(--fw-bold); margin-inline-start: 4px; }
+
+.product-card { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.product-card .product-media { aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-md); background: var(--color-surface-alt); margin-bottom: var(--space-3); }
+.product-card .shop-product-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+.product-card .shop-image-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-2xl);
+}
+.product-card .product-body { flex: 1; min-width: 0; padding: 0; }
+.product-card .product-name { overflow-wrap: anywhere; font-size: var(--fs-md); }
+.product-card .product-desc { overflow-wrap: anywhere; margin-bottom: var(--space-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.product-card .product-price { font-size: var(--fs-xl); font-weight: var(--fw-black); color: var(--color-blue); margin-block: var(--space-2); }
+.product-card .product-footer { padding-top: var(--space-3); }
+.product-card .product-footer .btn { min-height: 42px; }
+
+.purchase-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; background: var(--color-surface-alt); }
+.purchase-thumb .shop-product-image { width: 100%; height: 100%; object-fit: cover; }
+.purchase-thumb .shop-image-fallback { font-size: var(--fs-sm); }
+
+.confirm-buy .text-lg { font-size: var(--fs-lg); }

@@ -211,6 +211,16 @@ window.AmoyniUI = (function () {
     CODE_ALREADY_EXISTS: "هذا الكود مستخدم من قبل، اختر كودًا آخر.",
     PASSWORD_TOO_SHORT: "كلمة المرور يجب ألا تقل عن 6 خانات.",
     CAMPAIGN_NOT_ACTIVE: "الحملة غير نشطة.",
+    PRODUCT_NOT_FOUND: "المنتج غير موجود.",
+    PRODUCT_UNAVAILABLE: "هذا المنتج غير متاح حاليًا.",
+    OUT_OF_STOCK: "نفدت الكمية من هذا المنتج.",
+    INSUFFICIENT_POINTS: "رصيدك لا يكفي لشراء هذا المنتج.",
+    PURCHASE_LIMIT_REACHED: "لقد بلغت الحد الأقصى لشراء هذا المنتج.",
+    PURCHASE_NOT_FOUND: "عملية الشراء غير موجودة.",
+    PRODUCT_NAME_REQUIRED: "اسم المنتج مطلوب.",
+    INVALID_PRICE: "السعر يجب أن يكون صفرًا أو أكثر.",
+    INVALID_STOCK: "الكمية يجب أن تكون صفرًا أو أكثر.",
+    INVALID_LIMIT: "الحد الأقصى يجب أن يكون 1 أو أكثر.",
   };
 
   function friendlyError(err) {

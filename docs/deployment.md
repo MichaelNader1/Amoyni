@@ -17,6 +17,12 @@
 فقط ارفع محتوى المجلد كما هو. لا يوجد `node_modules` مطلوب في وقت التشغيل — كل مكتبات
 JavaScript (Supabase SDK، ماسح QR، الكونفيتي، مولّد QR) موجودة بالفعل داخل `assets/vendor/`.
 
+## تحديثات قاعدة البيانات
+بعد التشغيل الأول لـ `amoyni_supabase_setup.sql` وشغّل التنفيذ مثل:
+1. `supabase/migration_2_dashboard_spotlight.sql`
+2. `supabase/migration_3_secure_qr_attendance.sql` (نموذج التوكن — مستبدل، لا تستخدمه)
+3. `supabase/migration_4_shop.sql` (متجر النقاط)
+
 ## نقاط أمان مهمة قبل الرفع
 - **لا تضع أبدًا** `service_role key` في `config.js` أو أي ملف داخل المجلد — فقط الـ `anon key`.
 - تأكد أن `config.js` (بالقيم الحقيقية) غير مرفوع لمستودع عام إذا كنت لا تريد أن يرى الناس رابط

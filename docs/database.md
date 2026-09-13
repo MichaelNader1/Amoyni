@@ -2,13 +2,14 @@
 
 الملف الكامل: `supabase/amoyni_supabase_setup.sql` (ملف واحد، يُشغَّل من `SQL Editor` في Supabase).
 
-## الجداول (15 جدول)
+## الجداول (17 جدول)
 `profiles` · `admin_users` · `avatars` · `meetings` · `meeting_point_rules` ·
 `attendance_records` · `point_transactions` · `vouchers` · `voucher_redemptions` ·
 `referral_settings` · `referrals` · `donation_campaigns` · `donation_transactions` ·
-`app_settings` · `audit_logs`
+`app_settings` · `audit_logs` · `shop_products` · `shop_purchases`
 
 كل جدول موثّق بالتفصيل (الأعمدة والقيود) داخل ملف الـSQL نفسه في قسم "TABLES".
+جدولا `shop_products` و `shop_purchases` مضافة في `supabase/migration_4_shop.sql`.
 
 ## نموذج الصلاحيات (Authentication & RLS) — مهم جدًا
 المشروع يستخدم **مصادقة مخصّصة (Custom Auth)** برقم الهاتف/كلمة المرور، وليس Supabase Auth
@@ -43,6 +44,11 @@
    `get_admin_referrals`, `update_referral_settings`, `get_admin_donation_campaigns`,
    `create_donation_campaign`, `close_donation_campaign`, `get_donation_transactions_admin`,
    `get_admin_audit_log`, `get_report_points_breakdown`, `update_app_setting`.
+4. **دوال المتجر** (نقاط المكافآت — `supabase/migration_4_shop.sql`):
+   `get_shop_products_public` (صفحة المتجر للشباب)، `get_my_shop_purchases` (سجل مشتريات الشاب)،
+   `purchase_shop_product` (الشراء الذرّي)، `get_admin_shop_products`, `create_shop_product`,
+   `update_shop_product`, `get_admin_shop_purchases` (سجل المشتريات للأدمن)،
+   `admin_set_purchase_delivered` (تبديل حالة التسليم).
 
 ### لماذا الإضافات؟
 التصميم الأصلي عرّف الجداول والقيود والدوال الأساسية لتسجيل الحضور/النقاط، لكنه لم يُعرّف
@@ -60,6 +66,27 @@
 - الرصيد لا يقل عن صفر أبدًا (CHECK constraint + منطق الدوال).
 - شرائح نقاط الاجتماع لا تتداخل زمنيًا (Exclusion Constraint عبر `btree_gist`).
 - لا تبرع للنفس، لا استخدام مكرر لنفس الـVoucher، لا مراجعة (Reversal) مزدوجة لنفس الحركة.
+- سعر منتج المتجر والكمية لا يقلان عن صفر، والحد الأقصى للشراء إن وُجد لا يقل عن 1، واسم المنتج
+  لا يكون فارغًا، والكمية لا تنزل تحت الصفر أبدًا (الشراء الذرّي يقلّل `stock_quantity` بشرط
+  `stock_quantity > 0`).
+- تاريخ مشتريات المتجر لا يُحذف أبدًا (Snapshots + FK بـ NO ACTION).
+
+## متجر النقاط (Shop)
+ملف `supabase/migration_4_shop.sql` يضيف متجر المكافآت الذي يشتري به الشباب من رصيد النقاط عبر
+**دالة شراء واحدة ذرّية** `purchase_shop_product(p_user_id, p_product_id)`:
+
+- **Single transaction**: تأخذ `SELECT ... FOR UPDATE` على ملف الشاب ثم على المنتج، فتتسلسل
+  محاولات الشراء المتزامنة على نفس المنتج (منتج بكمية 1 لا يشتريه إلا شاب واحد).
+- تتحقق بالترتيب من: وجود الشاب، حالة الحساب، وجود المنتج، توافره، الكمية (`OUT_OF_STOCK`)،
+  الرصيد (`INSUFFICIENT_POINTS`)، والحد الأقصى لكل شاب (`PURCHASE_LIMIT_REACHED`) ثم تنفّذ
+  الخصم وتنقص الكمية وتُدرج سجل الشراء. أي خطأ يرجع بـ `raise exception` فلا يتطبّق أي جزء.
+- **Snapshots**: سجل الشراء يحفظ اسم/صورة/سعر المنتج لحظة الشراء، فلا تتغيّر التاريخ القديم لو
+  عُدّل المنتج أو أُخفِي لاحقًا.
+- **النقاط**: نوع `shop_purchase` أُضيف إلى `point_transactions` (نوع `debit`)، و
+  `sync_wallet_totals` يحتسبه ضمن "المنصرف"، وحساب `current_balance` ما زال مصدره الوحيد
+  `point_transactions` — لا يوجد نظام نقاط ثانٍ.
+- التعديلات على الدوال القائمة (`point_transactions` check، `sync_wallet_totals`,
+  `get_my_transactions` مع فلاتر `shop`) **إضافية فقط** ولا تُعيد كتابة أي صفوف موجودة.
 
 ## بيانات أولية (Seed Data)
 16 Avatar افتراضي، إعدادات تطبيق افتراضية (`app_settings`)، إعدادات دعوة معطّلة افتراضيًا
